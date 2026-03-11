@@ -615,18 +615,21 @@ function renderParc(){
       <td class="mn" style="font-size:10px;color:var(--muted2)">${N(e.tj)} / ${N(e.th)} / ${N(e.tm)}</td>
       <td class="mn">${e.conso||'?'} L/H</td>
       <td style="white-space:nowrap;display:flex;gap:6px">
-        <button class="btn btn-g btn-sm" onclick="cycleStatut('${e.id}')">Statut</button>
+        <select class="fs" onchange="changeStatut('${e.id}',this.value)" style="padding:5px 8px;font-size:11px;border-radius:6px;background:var(--panel);color:var(--text);border:1px solid var(--border2)">
+          <option value="Disponible" ${e.stat==='Disponible'?'selected':''}>✅ Disponible</option>
+          <option value="Loué" ${e.stat==='Loué'?'selected':''}>🔄 Loué</option>
+          <option value="Maintenance" ${e.stat==='Maintenance'?'selected':''}>🔧 Maintenance</option>
+          <option value="Transit" ${e.stat==='Transit'?'selected':''}>🚛 Transit</option>
+        </select>
         <button class="btn btn-sm" style="background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,143,232,.3)" onclick="editEngin('${e.id}')">✏️</button>
         <button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid rgba(232,69,69,.3)" onclick="deleteEngin('${e.id}')">🗑️</button>
       </td>
     </tr>`;}).join(''):'<tr><td colspan="12" class="empty">Aucun engin trouvé</td></tr>';
 }
 
-function cycleStatut(id){
+function changeStatut(id, newStat){
   const list=DB.engins();const e=list.find(x=>x.id===id);if(!e)return;
-  const opts=['Disponible','Loué','Maintenance','Transit'];
-  const next=opts[(opts.indexOf(e.stat)+1)%opts.length];
-  if(confirm(`Changer "${e.nom}" : ${e.stat} → ${next} ?`)){e.stat=next;DB.s('engins',list);renderParc();toast('✅ Statut mis à jour')}
+  e.stat=newStat;DB.s('engins',list);renderParc();toast('✅ Statut mis à jour : '+newStat);
 }
 
 // ── RENDER LOCATIONS ──────────────────────────────
@@ -657,13 +660,40 @@ function renderLocs(){
     <td><span class="bdg ${l.stat==='En cours'?'loue':'dispo'}">${l.stat}</span></td>
     <td>${l.esc==='Oui'?'<span class="bdg transit">🚔 OUI</span>':'<span style="color:var(--muted);font-size:11px">Non</span>'}</td>
     <td style="font-size:11px">${l.site||'—'}</td>
-    <td><button class="btn btn-g btn-sm" onclick="cloturer('${l.id}')">Clôturer</button></td>
+    <td style="white-space:nowrap">
+      ${l.stat==='En cours'?`
+        <button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid rgba(232,69,69,.3);margin-bottom:4px" onclick="cloturer('${l.id}')">🔒 Clôturer</button>
+        <button class="btn btn-sm" style="background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,143,232,.3)" onclick="prolonger('${l.id}')">📅 Prolonger</button>
+      `:'<span style="color:var(--muted);font-size:11px;font-family:var(--mono)">Terminée</span>'}
+    </td>
   </tr>`).join(''):'<tr><td colspan="12" class="empty">Aucune location</td></tr>';
 }
 
 function cloturer(id){
-  const list=DB.locs();const l=list.find(x=>x.id===id);if(!l||l.stat==='Terminé')return;
-  if(confirm(`Clôturer ${id} — ${l.cl} ?`)){l.stat='Terminé';DB.s('locs',list);renderLocs();toast('✅ Location clôturée')}
+  const list=DB.locs();const l=list.find(x=>x.id===id);
+  if(!l||l.stat==='Terminé'){toast('Location déjà terminée',true);return;}
+  if(confirm('Clôturer la location '+id+' — '+l.cl+' ?')){
+    l.stat='Terminé';DB.s('locs',list);renderLocs();toast('✅ Location clôturée');
+  }
+}
+
+function prolonger(id){
+  const list=DB.locs();const l=list.find(x=>x.id===id);if(!l)return;
+  const jours=prompt('Prolonger de combien de jours ?','7');
+  if(!jours||isNaN(jours))return;
+  const finActuelle=l.fin?new Date(l.fin):new Date();
+  finActuelle.setDate(finActuelle.getDate()+parseInt(jours));
+  const nouvelleFin=finActuelle.toISOString().split('T')[0];
+  // Recalcul du total selon le type
+  const type=l.type;
+  const tarif=l.tarif||0;
+  const debut=l.deb?new Date(l.deb):new Date();
+  const diff=(finActuelle-debut)/86400000;
+  let u=type==='Journalière'?Math.max(1,diff):type==='Hebdomadaire'?Math.max(1,Math.ceil(diff/7)):Math.max(1,Math.ceil(diff/30));
+  l.fin=nouvelleFin;
+  l.total=tarif*u;
+  DB.s('locs',list);renderLocs();
+  toast('📅 Location prolongée jusqu'au '+nouvelleFin);
 }
 
 // ── RENDER CARBURANT ──────────────────────────────
