@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VIA LOGISTICS — Système de Gestion</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0c0e13;--surface:#13161f;--panel:#1a1e2a;--card:#1f2435;
+  --border:#252b3b;--border2:#2f374d;
+  --orange:#e8722a;--orange-dim:rgba(232,114,42,.12);
+  --blue:#3b8fe8;--blue-dim:rgba(59,143,232,.12);
+  --green:#2ecf7a;--green-dim:rgba(46,207,122,.12);
+  --red:#e84545;--red-dim:rgba(232,69,69,.12);
+  --yellow:#f5b731;--yellow-dim:rgba(245,183,49,.12);
+  --purple:#a855f7;--purple-dim:rgba(168,85,247,.12);
+  --text:#e2e6f0;--muted:#5a6278;--muted2:#8892a4;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --display:'Bebas Neue',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:48px 48px;opacity:.13}
+header{position:sticky;top:0;z-index:200;height:60px;background:rgba(12,14,19,.96);
+  border-bottom:2px solid var(--orange);backdrop-filter:blur(16px);
+  display:flex;align-items:center;padding:0 20px;gap:16px}
+.logo{font-family:var(--display);font-size:24px;letter-spacing:4px;color:var(--orange)}
+.logo-sub{font-family:var(--mono);font-size:10px;color:var(--muted2);letter-spacing:2px}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.live-pill{display:flex;align-items:center;gap:6px;background:var(--green-dim);
+  border:1px solid rgba(46,207,122,.3);border-radius:20px;padding:4px 10px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:.3;box-shadow:none}}
+.live-txt{font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:1px}
+#clock{font-family:var(--mono);font-size:12px;color:var(--muted2)}
+.user-tag{font-family:var(--mono);font-size:11px;color:var(--orange);
+  background:var(--orange-dim);border:1px solid rgba(232,114,42,.3);padding:4px 10px;border-radius:4px}
+nav{position:sticky;top:60px;z-index:190;background:var(--surface);
+  border-bottom:1px solid var(--border2);display:flex;padding:0 16px;overflow-x:auto}
+nav::-webkit-scrollbar{height:3px}nav::-webkit-scrollbar-thumb{background:var(--border2)}
+.nb{background:none;border:none;cursor:pointer;color:var(--muted2);font-family:var(--sans);
+  font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  padding:14px 18px;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.nb:hover{color:var(--text)}.nb.active{color:var(--orange);border-bottom-color:var(--orange)}
+main{position:relative;z-index:1;padding:20px;max-width:1440px;margin:0 auto}
+.page{display:none}.page.active{display:block}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:16px;
+  position:relative;overflow:hidden;transition:transform .2s}
+.kpi:hover{transform:translateY(-2px)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.o::after{background:var(--orange)}.kpi.b::after{background:var(--blue)}
+.kpi.g::after{background:var(--green)}.kpi.r::after{background:var(--red)}
+.kpi.y::after{background:var(--yellow)}
+.kpi-lbl{font-family:var(--mono);font-size:9px;color:var(--muted2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.kpi-val{font-family:var(--display);font-size:36px;line-height:1}
+.kpi-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px}
+.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;margin-top:22px}
+.sec-hdr h2{font-family:var(--display);font-size:20px;letter-spacing:2px}
+.tag{font-family:var(--mono);font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:3px}
+.tag.o{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(232,114,42,.3)}
+.tag.b{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,143,232,.3)}
+.tag.g{background:var(--green-dim);color:var(--green);border:1px solid rgba(46,207,122,.3)}
+.tag.r{background:var(--red-dim);color:var(--red);border:1px solid rgba(232,69,69,.3)}
+.tag.y{background:var(--yellow-dim);color:var(--yellow);border:1px solid rgba(245,183,49,.3)}
+.tw{background:var(--card);border:1px solid var(--border2);border-radius:8px;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th{background:var(--panel);font-family:var(--mono);font-size:9px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted2);padding:12px 14px;text-align:left;
+  border-bottom:1px solid var(--border2);white-space:nowrap}
+td{padding:10px 14px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)}
+.mn{font-family:var(--mono);font-size:11px}
+.bdg{display:inline-block;font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.bdg.dispo{background:var(--green-dim);color:var(--green);border:1px solid rgba(46,207,122,.3)}
+.bdg.loue{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(232,114,42,.3)}
+.bdg.maint{background:var(--red-dim);color:var(--red);border:1px solid rgba(232,69,69,.3)}
+.bdg.transit{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,143,232,.3)}
+.bdg.jour{background:var(--yellow-dim);color:var(--yellow)}
+.bdg.sem{background:var(--blue-dim);color:var(--blue)}
+.bdg.mois{background:var(--purple-dim);color:var(--purple)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:1000;display:none;
+  align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border2);border-radius:10px;
+  padding:28px;width:100%;max-width:600px;max-height:88vh;overflow-y:auto;position:relative}
+.modal h3{font-family:var(--display);font-size:22px;letter-spacing:2px;margin-bottom:20px;color:var(--orange)}
+.mc{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted2);font-size:20px;cursor:pointer}
+.mc:hover{color:var(--text)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg .full{grid-column:1/-1}
+label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:1px;
+  color:var(--muted2);margin-bottom:5px;text-transform:uppercase}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border2);
+  border-radius:6px;padding:10px 12px;color:var(--text);font-family:var(--sans);
+  font-size:13px;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--orange)}
+select option{background:var(--panel)}
+textarea{resize:vertical;min-height:65px}
+.btn{padding:10px 20px;border-radius:6px;font-family:var(--sans);font-weight:600;
+  font-size:13px;cursor:pointer;border:none;transition:all .2s}
+.btn-p{background:var(--orange);color:#fff}.btn-p:hover{background:#d4621f}
+.btn-g{background:transparent;color:var(--muted2);border:1px solid var(--border2)}.btn-g:hover{color:var(--text)}
+.btn-r{background:var(--red-dim);color:var(--red);border:1px solid rgba(232,69,69,.3)}
+.btn-b{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,143,232,.3)}
+.btn-sm{padding:6px 12px;font-size:11px}
+.fa{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;
+  padding-top:16px;border-top:1px solid var(--border2)}
+.tb{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.tb-l{display:flex;gap:8px;flex:1;flex-wrap:wrap}
+.sb{background:var(--card);border:1px solid var(--border2);border-radius:6px;
+  padding:8px 14px;color:var(--text);font-size:13px;outline:none;min-width:180px;flex:1;max-width:300px}
+.sb:focus{border-color:var(--orange)}
+.fs{background:var(--card);border:1px solid var(--border2);border-radius:6px;
+  padding:8px 12px;color:var(--text);font-size:12px;outline:none}
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:20px}
+.rc{background:var(--card);border:1px solid var(--border2);border-radius:8px;
+  padding:18px;position:relative;overflow:hidden;transition:transform .2s}
+.rc:hover{transform:translateY(-2px)}
+.rb{position:absolute;top:10px;right:14px;font-family:var(--display);font-size:40px;opacity:.1}
+.rn{font-weight:700;font-size:14px;margin-bottom:3px}
+.rc-cap{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:1px;margin-bottom:12px}
+.rs{display:flex;justify-content:space-between;margin-bottom:5px}
+.rs-l{font-size:11px;color:var(--muted2)}.rs-v{font-family:var(--mono);font-size:11px;font-weight:600}
+.rbar{height:4px;background:var(--border2);border-radius:2px;margin-top:10px;overflow:hidden}
+.rfill{height:100%;border-radius:2px}
+.al{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.ai{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border2);
+  border-radius:6px;padding:12px 16px;border-left:3px solid}
+.ai.rouge{border-left-color:var(--red)}.ai.jaune{border-left-color:var(--yellow)}.ai.bleu{border-left-color:var(--blue)}
+.ad{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rouge .ad{background:var(--red)}.jaune .ad{background:var(--yellow)}.bleu .ad{background:var(--blue)}
+.at{flex:1;font-size:12px}.adate{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.pb{display:flex;align-items:center;gap:8px}
+.pbar{flex:1;min-width:50px;height:5px;background:var(--border2);border-radius:3px;overflow:hidden}
+.pfill{height:100%;border-radius:3px;background:var(--green)}
+.pfill.mid{background:var(--yellow)}.pfill.low{background:var(--red)}
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;font-weight:600;font-size:13px;
+  padding:12px 20px;border-radius:8px;transform:translateY(80px);opacity:0;
+  transition:all .3s;pointer-events:none;background:var(--green);color:#000}
+#toast.show{transform:translateY(0);opacity:1}#toast.err{background:var(--red);color:#fff}
+.empty{text-align:center;padding:40px;color:var(--muted);font-family:var(--mono);font-size:12px}
+@media(max-width:640px){.logo-sub,.user-tag{display:none}.fg{grid-template-columns:1fr}main{padding:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">VIA LOGISTICS</div>
+  <div class="logo-sub">DAKAR · SÉNÉGAL</div>
+  <div class="hdr-right">
+    <div class="live-pill"><div class="live-dot"></div><span class="live-txt">EN LIGNE</span></div>
+    <span id="clock"></span>
+    <div class="user-tag">SAM FALL — CHEF OPS</div>
+  </div>
+</header>
+<nav>
+  <button class="nb active" onclick="go('dashboard')" id="nav-dashboard">📊 Tableau de Bord</button>
+  <button class="nb" onclick="go('parc')" id="nav-parc">🏗️ Parc Engins</button>
+  <button class="nb" onclick="go('locations')" id="nav-locations">📋 Locations</button>
+  <button class="nb" onclick="go('carburant')" id="nav-carburant">⛽ Carburant</button>
+  <button class="nb" onclick="go('escorte')" id="nav-escorte">🚔 Escortes</button>
+  <button class="nb" onclick="go('financier')" id="nav-financier">💰 Financier</button>
+</nav>
+<main>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="kpi-row" id="db-kpi"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+    <div>
+      <div class="sec-hdr"><h2>TOP ENGINS RENTABLES</h2><span class="tag o">FLOTTE</span></div>
+      <div id="db-top"></div>
+    </div>
+    <div>
+      <div class="sec-hdr"><h2>ALERTES</h2><span class="tag r">URGENT</span></div>
+      <div class="al" id="db-alerts"></div>
+      <div class="sec-hdr"><h2>LOCATIONS EN COURS</h2><span class="tag g" id="db-lc-tag">0</span></div>
+      <div class="tw" id="db-locs"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PARC ENGINS -->
+<div class="page" id="page-parc">
+  <div class="tb">
+    <div class="tb-l">
+      <input class="sb" id="parc-s" placeholder="🔍 Rechercher un engin..." oninput="renderParc()"/>
+      <select class="fs" id="parc-f" onchange="renderParc()">
+        <option value="">Tous statuts</option>
+        <option>Disponible</option><option>Loué</option><option>Maintenance</option><option>Transit</option>
+      </select>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="openM('m-engin')">+ Ajouter engin</button>
+  </div>
+  <div class="kpi-row" id="parc-kpi"></div>
+  <div class="tw"><table>
+    <thead><tr>
+      <th>ENGIN / MODÈLE</th><th>CAP.</th><th>TYPE</th><th>STATUT</th>
+      <th>OPÉRATEUR</th><th>JOURS</th><th>CA GÉNÉRÉ (CFA)</th>
+      <th>CERTIF.</th><th>TARIF J/H/M</th><th>CONSO</th><th>ACTIONS</th>
+    </tr></thead>
+    <tbody id="parc-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- LOCATIONS -->
+<div class="page" id="page-locations">
+  <div class="tb">
+    <div class="tb-l">
+      <input class="sb" id="loc-s" placeholder="🔍 Client, engin, site..." oninput="renderLocs()"/>
+      <select class="fs" id="loc-ft" onchange="renderLocs()">
+        <option value="">Tous types</option><option>Journalière</option><option>Hebdomadaire</option><option>Mensuelle</option>
+      </select>
+      <select class="fs" id="loc-fs" onchange="renderLocs()">
+        <option value="">Tous statuts</option><option>En cours</option><option>Terminé</option>
+      </select>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="openM('m-loc')">+ Nouvelle location</button>
+  </div>
+  <div class="kpi-row" id="loc-kpi"></div>
+  <div class="tw"><table>
+    <thead><tr>
+      <th>RÉFÉRENCE</th><th>CLIENT</th><th>ENGIN</th><th>FACTURATION</th>
+      <th>DÉBUT</th><th>FIN</th><th>TARIF UNIT.</th><th>TOTAL DÛ (CFA)</th>
+      <th>STATUT</th><th>ESCORTE</th><th>SITE</th><th>ACTIONS</th>
+    </tr></thead>
+    <tbody id="loc-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- CARBURANT -->
+<div class="page" id="page-carburant">
+  <div class="tb">
+    <div class="tb-l">
+      <input class="sb" id="fuel-s" placeholder="🔍 Engin, opérateur..." oninput="renderFuel()"/>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="openM('m-fuel')">+ Saisir plein</button>
+  </div>
+  <div class="kpi-row" id="fuel-kpi"></div>
+  <div class="sec-hdr"><h2>CLASSEMENT CONSOMMATION</h2><span class="tag y">PAR ENGIN</span></div>
+  <div class="rg" id="fuel-rank"></div>
+  <div class="sec-hdr"><h2>REGISTRE DES PLEINS</h2></div>
+  <div class="tw"><table>
+    <thead><tr>
+      <th>DATE</th><th>ENGIN</th><th>LITRES</th><th>PRIX/L</th>
+      <th>COÛT TOTAL (CFA)</th><th>COMPTEUR (h)</th><th>OPÉRATEUR</th><th>NOTES</th>
+    </tr></thead>
+    <tbody id="fuel-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- ESCORTES -->
+<div class="page" id="page-escorte">
+  <div class="tb">
+    <div class="tb-l">
+      <input class="sb" id="esc-s" placeholder="🔍 Client, trajet, engin..." oninput="renderEsc()"/>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="openM('m-esc')">+ Nouvelle escorte</button>
+  </div>
+  <div class="kpi-row" id="esc-kpi"></div>
+  <div class="tw"><table>
+    <thead><tr>
+      <th>DATE</th><th>ENGIN</th><th>TRAJET</th><th>KM</th><th>GENDARMES</th>
+      <th>COÛT GEND.</th><th>FACTURÉ CLIENT</th><th>MARGE</th>
+      <th>CLIENT</th><th>RÉF.</th><th>STATUT</th><th>ACTION</th>
+    </tr></thead>
+    <tbody id="esc-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- FINANCIER -->
+<div class="page" id="page-financier">
+  <div class="kpi-row" id="fin-kpi"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <div class="sec-hdr"><h2>CA PAR CLIENT</h2><span class="tag o">TOP</span></div>
+      <div class="tw"><table><thead><tr><th>CLIENT</th><th>TOTAL (CFA)</th><th>PART</th></tr></thead><tbody id="fin-clients"></tbody></table></div>
+    </div>
+    <div>
+      <div class="sec-hdr"><h2>RENTABILITÉ PAR ENGIN</h2><span class="tag b">MARGE</span></div>
+      <div class="tw"><table><thead><tr><th>ENGIN</th><th>CA</th><th>CARBURANT</th><th>MARGE %</th></tr></thead><tbody id="fin-engins"></tbody></table></div>
+    </div>
+  </div>
+  <div class="sec-hdr" style="margin-top:20px"><h2>RÉCAPITULATIF MENSUEL 2025</h2><span class="tag g">RÉSULTAT</span></div>
+  <div class="tw"><table>
+    <thead><tr><th>MOIS</th><th>CA (CFA)</th><th>ESCORTES (CFA)</th><th>CARBURANT (CFA)</th><th>MARGE (CFA)</th><th>MARGE %</th></tr></thead>
+    <tbody id="fin-month"></tbody>
+  </table></div>
+</div>
+</main>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Ajouter Engin -->
+<div class="overlay" id="m-engin">
+<div class="modal">
+  <button class="mc" onclick="closeM('m-engin')">✕</button>
+  <h3>NOUVEL ENGIN</h3>
+  <div class="fg">
+    <div><label>Identifiant</label><input id="e-nom" placeholder="GRUE-100T-01"/></div>
+    <div><label>Marque / Modèle</label><input id="e-mod" placeholder="Liebherr LTM 1100"/></div>
+    <div><label>Type</label><select id="e-type"><option>Grue mobile</option><option>Grue sur camion</option><option>Camion lourd</option><option>Chariot élévateur</option></select></div>
+    <div><label>Capacité (T)</label><input id="e-cap" type="number" placeholder="100"/></div>
+    <div><label>Statut</label><select id="e-stat"><option>Disponible</option><option>Loué</option><option>Maintenance</option><option>Transit</option></select></div>
+    <div><label>Conso. théorique (L/H)</label><input id="e-conso" type="number" placeholder="25"/></div>
+    <div><label>Tarif Journalier (CFA)</label><input id="e-tj" type="number" placeholder="500000"/></div>
+    <div><label>Tarif Hebdomadaire (CFA)</label><input id="e-th" type="number" placeholder="3000000"/></div>
+    <div><label>Tarif Mensuel (CFA)</label><input id="e-tm" type="number" placeholder="10000000"/></div>
+    <div><label>Expiry Certificat</label><input id="e-cert" type="date"/></div>
+    <div class="full"><label>Opérateur attitré</label><input id="e-op" placeholder="Prénom Nom"/></div>
+    <div class="full"><label>Notes</label><textarea id="e-notes"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn btn-g" onclick="closeM('m-engin')">Annuler</button><button class="btn btn-p" onclick="saveEngin()">Enregistrer</button></div>
+</div></div>
+
+<!-- Modifier Engin -->
+<div class="overlay" id="m-edit">
+<div class="modal">
+  <button class="mc" onclick="closeM('m-edit')">✕</button>
+  <h3>MODIFIER ENGIN</h3>
+  <input type="hidden" id="ee-id"/>
+  <div class="fg">
+    <div><label>Identifiant</label><input id="ee-nom"/></div>
+    <div><label>Marque / Modèle</label><input id="ee-mod"/></div>
+    <div><label>Type</label><select id="ee-type"><option>Grue mobile</option><option>Grue sur camion</option><option>Camion lourd</option><option>Chariot élévateur</option></select></div>
+    <div><label>Capacité (T)</label><input id="ee-cap" type="number"/></div>
+    <div><label>Statut</label><select id="ee-stat"><option>Disponible</option><option>Loué</option><option>Maintenance</option><option>Transit</option></select></div>
+    <div><label>Conso. théorique (L/H)</label><input id="ee-conso" type="number"/></div>
+    <div><label>Tarif Journalier (CFA)</label><input id="ee-tj" type="number"/></div>
+    <div><label>Tarif Hebdomadaire (CFA)</label><input id="ee-th" type="number"/></div>
+    <div><label>Tarif Mensuel (CFA)</label><input id="ee-tm" type="number"/></div>
+    <div><label>Expiry Certificat</label><input id="ee-cert" type="date"/></div>
+    <div class="full"><label>Opérateur attitré</label><input id="ee-op"/></div>
+    <div class="full"><label>Notes</label><textarea id="ee-notes"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn btn-g" onclick="closeM('m-edit')">Annuler</button><button class="btn btn-p" onclick="updateEngin()">Enregistrer</button></div>
+</div></div>
+
+<!-- Changer Statut -->
+<div class="overlay" id="m-stat">
+<div class="modal" style="max-width:360px">
+  <button class="mc" onclick="closeM('m-stat')">✕</button>
+  <h3>CHANGER STATUT</h3>
+  <input type="hidden" id="st-id"/>
+  <p style="font-size:13px;color:var(--muted2);margin-bottom:16px">Engin : <strong id="st-nom" style="color:var(--orange)"></strong></p>
+  <div>
+    <label>Nouveau statut</label>
+    <select id="st-sel">
+      <option value="Disponible">✅ Disponible</option>
+      <option value="Loué">🔄 Loué</option>
+      <option value="Maintenance">🔧 Maintenance</option>
+      <option value="Transit">🚛 Transit</option>
+    </select>
+  </div>
+  <div class="fa"><button class="btn btn-g" onclick="closeM('m-stat')">Annuler</button><button class="btn btn-p" onclick="saveStatut()">Confirmer</button></div>
+</div></div>
+
+<!-- Prolonger Location -->
+<div class="overlay" id="m-prolong">
+<div class="modal" style="max-width:400px">
+  <button class="mc" onclick="closeM('m-prolong')">✕</button>
+  <h3>PROLONGER LOCATION</h3>
+  <input type="hidden" id="pr-id"/>
+  <p style="font-size:13px;color:var(--muted2);margin-bottom:4px">Client : <strong id="pr-cl" style="color:var(--text)"></strong></p>
+  <p style="font-size:13px;color:var(--muted2);margin-bottom:16px">Date de fin actuelle : <strong id="pr-fin" style="color:var(--orange)"></strong></p>
+  <div class="fg">
+    <div><label>Prolonger de (jours)</label><input id="pr-jours" type="number" placeholder="7" value="7"/></div>
+    <div><label>Nouvelle date de fin</label><input id="pr-newfin" type="date" readonly style="opacity:.7"/></div>
+  </div>
+  <div class="fa"><button class="btn btn-g" onclick="closeM('m-prolong')">Annuler</button><button class="btn btn-p" onclick="confirmerProlong()">Prolonger</button></div>
+</div></div>
+
+<!-- Nouvelle Location -->
+<div class="overlay" id="m-loc">
+<div class="modal">
+  <button class="mc" onclick="closeM('m-loc')">✕</button>
+  <h3>NOUVELLE LOCATION</h3>
+  <div class="fg">
+    <div class="full"><label>Client</label><input id="l-cl" placeholder="Nom entreprise cliente"/></div>
+    <div><label>Engin</label><select id="l-eng"></select></div>
+    <div><label>Type facturation</label><select id="l-type"><option>Journalière</option><option>Hebdomadaire</option><option>Mensuelle</option></select></div>
+    <div><label>Date début</label><input id="l-deb" type="date"/></div>
+    <div><label>Date fin prévue</label><input id="l-fin" type="date"/></div>
+    <div><label>Tarif appliqué (CFA)</label><input id="l-tarif" type="number" placeholder="500000"/></div>
+    <div><label>Site / Destination</label><input id="l-site" placeholder="Sococim, Thiès..."/></div>
+    <div><label>Escorte requise ?</label><select id="l-esc"><option value="Non">Non</option><option value="Oui">Oui</option></select></div>
+    <div class="full"><label>Notes</label><textarea id="l-notes"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn btn-g" onclick="closeM('m-loc')">Annuler</button><button class="btn btn-p" onclick="saveLoc()">Enregistrer</button></div>
+</div></div>
+
+<!-- Carburant -->
+<div class="overlay" id="m-fuel">
+<div class="modal">
+  <button class="mc" onclick="closeM('m-fuel')">✕</button>
+  <h3>SAISIE CARBURANT</h3>
+  <div class="fg">
+    <div><label>Date</label><input id="f-date" type="date"/></div>
+    <div><label>Engin</label><select id="f-eng"></select></div>
+    <div><label>Litres</label><input id="f-lit" type="number" placeholder="200"/></div>
+    <div><label>Prix/Litre (CFA)</label><input id="f-prix" type="number" placeholder="850" value="850"/></div>
+    <div><label>Compteur (heures)</label><input id="f-cpt" type="number" placeholder="1250"/></div>
+    <div><label>Opérateur</label><input id="f-op" placeholder="Prénom Nom"/></div>
+    <div class="full"><label>Notes</label><textarea id="f-notes"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn btn-g" onclick="closeM('m-fuel')">Annuler</button><button class="btn btn-p" onclick="saveFuel()">Enregistrer</button></div>
+</div></div>
+
+<!-- Escorte -->
+<div class="overlay" id="m-esc">
+<div class="modal">
+  <button class="mc" onclick="closeM('m-esc')">✕</button>
+  <h3>ESCORTE GENDARMERIE</h3>
+  <div class="fg">
+    <div><label>Date</label><input id="es-date" type="date"/></div>
+    <div><label>Engin concerné</label><select id="es-eng"></select></div>
+    <div class="full"><label>Trajet</label><input id="es-traj" placeholder="Dakar → Thiès"/></div>
+    <div><label>Distance (km)</label><input id="es-km" type="number" placeholder="70"/></div>
+    <div><label>Nb. gendarmes</label><input id="es-gend" type="number" placeholder="4"/></div>
+    <div><label>Coût gendarmerie (CFA)</label><input id="es-cout" type="number" placeholder="150000"/></div>
+    <div><label>Client à facturer</label><input id="es-cl" placeholder="Nom du client"/></div>
+    <div><label>Montant facturé client (CFA)</label><input id="es-fact" type="number" placeholder="200000"/></div>
+    <div><label>Référence location</label><input id="es-ref" placeholder="LOC-2025-001"/></div>
+    <div><label>Statut paiement</label><select id="es-stat"><option>En attente</option><option>Facturé</option><option>Payé</option></select></div>
+    <div class="full"><label>Notes</label><textarea id="es-notes"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn btn-g" onclick="closeM('m-esc')">Annuler</button><button class="btn btn-p" onclick="saveEsc()">Enregistrer</button></div>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+// ══ STORE ══════════════════════════════════════════
+const _s={engins:[],locs:[],fuels:[],escs:[]};
+const DB={
+  g:k=>_s[k]||[],
+  s:(k,v)=>{_s[k]=JSON.parse(JSON.stringify(v))},
+  engins:()=>DB.g('engins'),locs:()=>DB.g('locs'),
+  fuels:()=>DB.g('fuels'),escs:()=>DB.g('escs'),
+};
+
+// ══ SEED ═══════════════════════════════════════════
+function seed(){
+  if(DB.engins().length)return;
+  DB.s('engins',[
+    {id:'E001',nom:'GRUE-250T',mod:'Liebherr LTM 1250-6.1',type:'Grue mobile',cap:250,stat:'Loué',tj:1800000,th:11000000,tm:38000000,conso:42,cert:'2025-09-15',op:'Ibrahima Sow',notes:'Grue phare',jours:18,ca:32400000},
+    {id:'E002',nom:'GRUE-100T',mod:'Tadano ATF 100G-4',type:'Grue mobile',cap:100,stat:'Loué',tj:900000,th:5500000,tm:18000000,conso:28,cert:'2025-11-20',op:'Mamadou Diallo',notes:'',jours:22,ca:19800000},
+    {id:'E003',nom:'GRUE-60T',mod:'Grove GMK 3060',type:'Grue mobile',cap:60,stat:'Disponible',tj:600000,th:3500000,tm:12000000,conso:20,cert:'2026-01-10',op:'Cheikh Ndiaye',notes:'',jours:14,ca:8400000},
+    {id:'E004',nom:'GRUE-30T',mod:'Liebherr LTM 1030-2.1',type:'Grue sur camion',cap:30,stat:'Loué',tj:350000,th:2100000,tm:7000000,conso:15,cert:'2025-07-30',op:'Oumar Badji',notes:'Certif. à renouveler',jours:25,ca:8750000},
+    {id:'E005',nom:'CAMION-30T-A',mod:'Mercedes Actros 4160',type:'Camion lourd',cap:30,stat:'Transit',tj:280000,th:1600000,tm:5000000,conso:35,cert:'2026-03-01',op:'Aliou Mbaye',notes:'',jours:20,ca:5600000},
+    {id:'E006',nom:'CAMION-30T-B',mod:'Volvo FH16 750',type:'Camion lourd',cap:30,stat:'Maintenance',tj:280000,th:1600000,tm:5000000,conso:33,cert:'2026-02-15',op:'Samba Tall',notes:'Révision moteur',jours:10,ca:2800000},
+  ]);
+  DB.s('locs',[
+    {id:'LOC-2025-001',cl:'Sococim Industries',eng:'GRUE-250T',type:'Mensuelle',deb:'2025-03-01',fin:'2025-03-31',tarif:38000000,total:38000000,site:'Rufisque',esc:'Oui',stat:'En cours'},
+    {id:'LOC-2025-002',cl:'DHL Sénégal',eng:'GRUE-100T',type:'Hebdomadaire',deb:'2025-03-05',fin:'2025-03-12',tarif:5500000,total:5500000,site:'Port de Dakar',esc:'Non',stat:'En cours'},
+    {id:'LOC-2025-003',cl:'Eiffage Sénégal',eng:'GRUE-30T',type:'Journalière',deb:'2025-03-08',fin:'2025-03-10',tarif:350000,total:1050000,site:'Thiès',esc:'Oui',stat:'En cours'},
+    {id:'LOC-2025-004',cl:'Senelec',eng:'CAMION-30T-A',type:'Hebdomadaire',deb:'2025-02-20',fin:'2025-02-27',tarif:1600000,total:1600000,site:'Saint-Louis',esc:'Non',stat:'Terminé'},
+    {id:'LOC-2025-005',cl:'Total Energies SN',eng:'GRUE-60T',type:'Mensuelle',deb:'2025-02-01',fin:'2025-02-28',tarif:12000000,total:12000000,site:'Mbao',esc:'Oui',stat:'Terminé'},
+  ]);
+  DB.s('fuels',[
+    {date:'2025-03-01',eng:'GRUE-250T',lit:840,prix:850,cpt:4250,op:'Ibrahima Sow',notes:'Plein avant chantier'},
+    {date:'2025-03-03',eng:'GRUE-100T',lit:560,prix:850,cpt:2180,op:'Mamadou Diallo',notes:''},
+    {date:'2025-03-05',eng:'CAMION-30T-A',lit:420,prix:850,cpt:87500,op:'Aliou Mbaye',notes:'Départ Saint-Louis'},
+    {date:'2025-03-07',eng:'GRUE-30T',lit:300,prix:850,cpt:1560,op:'Oumar Badji',notes:''},
+    {date:'2025-03-09',eng:'GRUE-250T',lit:700,prix:850,cpt:4290,op:'Ibrahima Sow',notes:'Vérif. hydraulique'},
+    {date:'2025-03-10',eng:'GRUE-60T',lit:400,prix:850,cpt:3100,op:'Cheikh Ndiaye',notes:''},
+  ]);
+  DB.s('escs',[
+    {date:'2025-03-01',eng:'GRUE-250T',traj:'Dakar → Rufisque',km:25,gend:4,cout:300000,cl:'Sococim Industries',fact:420000,ref:'LOC-2025-001',stat:'Payé',notes:''},
+    {date:'2025-03-08',eng:'GRUE-30T',traj:'Dakar → Thiès',km:70,gend:4,cout:450000,cl:'Eiffage Sénégal',fact:600000,ref:'LOC-2025-003',stat:'Facturé',notes:'RN1'},
+    {date:'2025-02-20',eng:'CAMION-30T-A',traj:'Dakar → Saint-Louis',km:265,gend:4,cout:900000,cl:'Senelec',fact:1200000,ref:'LOC-2025-004',stat:'Payé',notes:'Convoi exceptionnel'},
+  ]);
+}
+
+// ══ UTILS ══════════════════════════════════════════
+const N=n=>n?Number(n).toLocaleString('fr-FR'):'0';
+const CFA=n=>N(n)+' CFA';
+function toast(m,err){
+  const t=document.getElementById('toast');
+  t.textContent=m;t.className='show'+(err?' err':'');
+  setTimeout(()=>t.className='',2800);
+}
+function today(){return new Date().toISOString().split('T')[0]}
+
+// ══ NAV ════════════════════════════════════════════
+function go(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  const fn={dashboard:renderDB,parc:renderParc,locations:renderLocs,carburant:renderFuel,escorte:renderEsc,financier:renderFin};
+  if(fn[name])fn[name]();
+}
+
+// ══ MODALS ══════════════════════════════════════════
+function openM(id){
+  const engs=DB.engins();
+  ['l-eng','f-eng','es-eng'].forEach(sid=>{
+    const s=document.getElementById(sid);
+    if(s)s.innerHTML=engs.map(e=>'<option value="'+e.nom+'">'+e.nom+' ('+e.cap+'T)</option>').join('');
+  });
+  ['f-date','es-date','l-deb','l-fin'].forEach(sid=>{
+    const el=document.getElementById(sid);if(el&&!el.value)el.value=today();
+  });
+  document.getElementById(id).classList.add('open');
+}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+// ══ ENGIN ACTIONS ═══════════════════════════════════
+function saveEngin(){
+  const nom=document.getElementById('e-nom').value.trim();
+  if(!nom){toast('Identifiant requis',true);return}
+  const list=DB.engins();
+  list.push({
+    id:'E'+Date.now(),nom,mod:document.getElementById('e-mod').value,
+    type:document.getElementById('e-type').value,cap:+document.getElementById('e-cap').value||0,
+    stat:document.getElementById('e-stat').value,conso:+document.getElementById('e-conso').value||0,
+    tj:+document.getElementById('e-tj').value||0,th:+document.getElementById('e-th').value||0,
+    tm:+document.getElementById('e-tm').value||0,cert:document.getElementById('e-cert').value,
+    op:document.getElementById('e-op').value,notes:document.getElementById('e-notes').value,jours:0,ca:0
+  });
+  DB.s('engins',list);closeM('m-engin');toast('✅ Engin ajouté');renderParc();
+}
+
+function editEngin(id){
+  const e=DB.engins().find(x=>x.id===id);if(!e)return;
+  document.getElementById('ee-id').value=e.id;
+  document.getElementById('ee-nom').value=e.nom||'';
+  document.getElementById('ee-mod').value=e.mod||'';
+  document.getElementById('ee-cap').value=e.cap||'';
+  document.getElementById('ee-conso').value=e.conso||'';
+  document.getElementById('ee-tj').value=e.tj||'';
+  document.getElementById('ee-th').value=e.th||'';
+  document.getElementById('ee-tm').value=e.tm||'';
+  document.getElementById('ee-cert').value=e.cert||'';
+  document.getElementById('ee-op').value=e.op||'';
+  document.getElementById('ee-notes').value=e.notes||'';
+  document.getElementById('ee-type').value=e.type||'Grue mobile';
+  document.getElementById('ee-stat').value=e.stat||'Disponible';
+  document.getElementById('m-edit').classList.add('open');
+}
+
+function updateEngin(){
+  const id=document.getElementById('ee-id').value;
+  const list=DB.engins();const idx=list.findIndex(x=>x.id===id);if(idx<0)return;
+  list[idx]={...list[idx],
+    nom:document.getElementById('ee-nom').value,mod:document.getElementById('ee-mod').value,
+    type:document.getElementById('ee-type').value,cap:+document.getElementById('ee-cap').value||0,
+    stat:document.getElementById('ee-stat').value,conso:+document.getElementById('ee-conso').value||0,
+    tj:+document.getElementById('ee-tj').value||0,th:+document.getElementById('ee-th').value||0,
+    tm:+document.getElementById('ee-tm').value||0,cert:document.getElementById('ee-cert').value,
+    op:document.getElementById('ee-op').value,notes:document.getElementById('ee-notes').value,
+  };
+  DB.s('engins',list);closeM('m-edit');toast('✅ Engin mis à jour');renderParc();
+}
+
+function deleteEngin(id){
+  const e=DB.engins().find(x=>x.id===id);if(!e)return;
+  if(confirm('Supprimer définitivement "'+e.nom+'" du parc ?')){
+    DB.s('engins',DB.engins().filter(x=>x.id!==id));
+    toast('🗑️ Engin supprimé');renderParc();
+  }
+}
+
+function ouvrirStatut(id){
+  const e=DB.engins().find(x=>x.id===id);if(!e)return;
+  document.getElementById('st-id').value=id;
+  document.getElementById('st-nom').textContent=e.nom;
+  document.getElementById('st-sel').value=e.stat;
+  document.getElementById('m-stat').classList.add('open');
+}
+
+function saveStatut(){
+  const id=document.getElementById('st-id').value;
+  const newStat=document.getElementById('st-sel').value;
+  const list=DB.engins();const e=list.find(x=>x.id===id);if(!e)return;
+  e.stat=newStat;DB.s('engins',list);closeM('m-stat');
+  toast('✅ Statut : '+newStat);renderParc();
+}
+
+// ══ LOCATION ACTIONS ════════════════════════════════
+function saveLoc(){
+  const cl=document.getElementById('l-cl').value.trim();
+  if(!cl){toast('Client requis',true);return}
+  const deb=document.getElementById('l-deb').value;
+  const fin=document.getElementById('l-fin').value;
+  const tarif=+document.getElementById('l-tarif').value||0;
+  const type=document.getElementById('l-type').value;
+  let u=1;
+  if(deb&&fin){
+    const d=(new Date(fin)-new Date(deb))/86400000;
+    u=type==='Journalière'?Math.max(1,d):type==='Hebdomadaire'?Math.max(1,Math.ceil(d/7)):Math.max(1,Math.ceil(d/30));
+  }
+  const eng=document.getElementById('l-eng').value.split(' (')[0];
+  const list=DB.locs();
+  list.push({
+    id:'LOC-'+Date.now(),cl,eng,type,deb,fin,tarif,total:tarif*u,
+    site:document.getElementById('l-site').value,esc:document.getElementById('l-esc').value,
+    stat:'En cours',notes:document.getElementById('l-notes').value
+  });
+  DB.s('locs',list);closeM('m-loc');toast('✅ Location enregistrée');renderLocs();
+}
+
+function cloturer(id){
+  const list=DB.locs();const l=list.find(x=>x.id===id);
+  if(!l||l.stat==='Terminé'){toast('Déjà terminée',true);return}
+  if(confirm('Clôturer la location '+id+' — '+l.cl+' ?')){
+    l.stat='Terminé';DB.s('locs',list);renderLocs();toast('✅ Location clôturée');
+  }
+}
+
+function ouvrirProlong(id){
+  const l=DB.locs().find(x=>x.id===id);if(!l)return;
+  document.getElementById('pr-id').value=id;
+  document.getElementById('pr-cl').textContent=l.cl;
+  document.getElementById('pr-fin').textContent=l.fin||'Non définie';
+  const base=l.fin?new Date(l.fin):new Date();
+  base.setDate(base.getDate()+7);
+  document.getElementById('pr-newfin').value=base.toISOString().split('T')[0];
+  document.getElementById('pr-jours').value=7;
+  document.getElementById('m-prolong').classList.add('open');
+}
+
+document.addEventListener('input',function(e){
+  if(e.target.id==='pr-jours'){
+    const id=document.getElementById('pr-id').value;
+    const l=DB.locs().find(x=>x.id===id);if(!l)return;
+    const base=l.fin?new Date(l.fin):new Date();
+    base.setDate(base.getDate()+parseInt(e.target.value||0));
+    document.getElementById('pr-newfin').value=base.toISOString().split('T')[0];
+  }
+});
+
+function confirmerProlong(){
+  const id=document.getElementById('pr-id').value;
+  const jours=parseInt(document.getElementById('pr-jours').value||0);
+  if(!jours){toast('Nombre de jours requis',true);return}
+  const list=DB.locs();const l=list.find(x=>x.id===id);if(!l)return;
+  const base=l.fin?new Date(l.fin):new Date();
+  base.setDate(base.getDate()+jours);
+  const nouvFin=base.toISOString().split('T')[0];
+  const diff=(new Date(nouvFin)-new Date(l.deb))/86400000;
+  const u=l.type==='Journalière'?Math.max(1,diff):l.type==='Hebdomadaire'?Math.max(1,Math.ceil(diff/7)):Math.max(1,Math.ceil(diff/30));
+  l.fin=nouvFin;l.total=(l.tarif||0)*u;
+  DB.s('locs',list);closeM('m-prolong');
+  toast('📅 Prolongée jusqu\'au '+nouvFin);renderLocs();
+}
+
+// ══ CARBURANT ACTIONS ═══════════════════════════════
+function saveFuel(){
+  const lit=+document.getElementById('f-lit').value||0;
+  if(!lit){toast('Litres requis',true);return}
+  const list=DB.fuels();
+  list.push({
+    date:document.getElementById('f-date').value,
+    eng:document.getElementById('f-eng').value.split(' (')[0],
+    lit,prix:+document.getElementById('f-prix').value||850,
+    cpt:+document.getElementById('f-cpt').value||0,
+    op:document.getElementById('f-op').value,notes:document.getElementById('f-notes').value
+  });
+  DB.s('fuels',list);closeM('m-fuel');toast('✅ Plein enregistré');renderFuel();
+}
+
+// ══ ESCORTE ACTIONS ══════════════════════════════════
+function saveEsc(){
+  const list=DB.escs();
+  list.push({
+    date:document.getElementById('es-date').value,
+    eng:document.getElementById('es-eng').value.split(' (')[0],
+    traj:document.getElementById('es-traj').value,km:+document.getElementById('es-km').value||0,
+    gend:+document.getElementById('es-gend').value||0,cout:+document.getElementById('es-cout').value||0,
+    cl:document.getElementById('es-cl').value,fact:+document.getElementById('es-fact').value||0,
+    ref:document.getElementById('es-ref').value,stat:document.getElementById('es-stat').value,
+    notes:document.getElementById('es-notes').value
+  });
+  DB.s('escs',list);closeM('m-esc');toast('✅ Escorte enregistrée');renderEsc();
+}
+
+function payEsc(date,eng){
+  const list=DB.escs();const e=list.find(x=>x.date===date&&x.eng===eng);
+  if(!e)return;e.stat='Payé';DB.s('escs',list);renderEsc();toast('✅ Marquée payée');
+}
+
+// ══ RENDERS ══════════════════════════════════════════
+
+function renderDB(){
+  const engs=DB.engins(),locs=DB.locs(),fuels=DB.fuels();
+  const dispo=engs.filter(e=>e.stat==='Disponible').length;
+  const loue=engs.filter(e=>e.stat==='Loué').length;
+  const maint=engs.filter(e=>e.stat==='Maintenance').length;
+  const ca=locs.reduce((s,l)=>s+(+l.total||0),0);
+  const fc=fuels.reduce((s,f)=>s+(f.lit*f.prix),0);
+  const actives=locs.filter(l=>l.stat==='En cours');
+
+  document.getElementById('db-kpi').innerHTML=
+    kpiBox('o',engs.length,'FLOTTE TOTALE','engins')+
+    kpiBox('g',dispo,'DISPONIBLES','prêts à louer')+
+    kpiBox('b',loue,'EN LOCATION','actifs sur site')+
+    kpiBox('r',maint,'MAINTENANCE','indisponibles')+
+    kpiBox('o',N(ca),'CA CUMUL (CFA)','','font-size:20px;color:var(--orange)')+
+    kpiBox('y',N(fc),'CARBURANT (CFA)','','font-size:20px;color:var(--yellow)');
+
+  const sorted=[...engs].sort((a,b)=>(b.ca||0)-(a.ca||0)).slice(0,4);
+  const maxCA=sorted[0]?.ca||1;
+  document.getElementById('db-top').innerHTML=sorted.map((e,i)=>`
+    <div class="rc" style="margin-bottom:10px">
+      <div class="rb">#${i+1}</div>
+      <div class="rn">${e.nom}</div>
+      <div class="rc-cap">${e.mod} · ${e.cap}T</div>
+      <div class="rs"><span class="rs-l">CA généré</span><span class="rs-v" style="color:var(--green)">${CFA(e.ca)}</span></div>
+      <div class="rs"><span class="rs-l">Jours travaillés</span><span class="rs-v">${e.jours||0} j</span></div>
+      <div class="rs"><span class="rs-l">Statut</span><span class="bdg ${statClass(e.stat)}">${e.stat}</span></div>
+      <div class="rbar"><div class="rfill" style="width:${Math.round(((e.ca||0)/maxCA)*100)}%;background:linear-gradient(90deg,var(--orange),var(--yellow))"></div></div>
+    </div>`).join('');
+
+  const alerts=[];
+  engs.forEach(e=>{
+    if(e.cert){const d=Math.ceil((new Date(e.cert)-new Date())/86400000);
+      if(d<0)alerts.push({t:'rouge',m:'🔴 Certificat EXPIRÉ — '+e.nom,d:e.cert});
+      else if(d<30)alerts.push({t:'jaune',m:'⚠️ Certificat expire dans '+d+'j — '+e.nom,d:e.cert});
+    }
+    if(e.stat==='Maintenance')alerts.push({t:'rouge',m:'🔧 En maintenance — '+e.nom,d:'En cours'});
+  });
+  if(!alerts.length)alerts.push({t:'bleu',m:"✅ Aucune alerte urgente — Flotte opérationnelle",d:"Aujourd'hui"});
+  document.getElementById('db-alerts').innerHTML=alerts.slice(0,5).map(a=>
+    '<div class="ai '+a.t+'"><div class="ad"></div><div class="at">'+a.m+'</div><div class="adate">'+a.d+'</div></div>'
+  ).join('');
+
+  document.getElementById('db-lc-tag').textContent=actives.length+' ACTIVES';
+  document.getElementById('db-locs').innerHTML=actives.length?
+    '<table><thead><tr><th>CLIENT</th><th>ENGIN</th><th>TYPE</th><th>FIN</th><th>TARIF</th></tr></thead><tbody>'+
+    actives.map(l=>'<tr><td><strong>'+l.cl+'</strong></td><td class="mn">'+l.eng+'</td><td><span class="bdg '+typeClass(l.type)+'">'+l.type+'</span></td><td class="mn">'+l.fin+'</td><td class="mn" style="color:var(--green)">'+CFA(l.tarif)+'</td></tr>').join('')+
+    '</tbody></table>':'<div class="empty">Aucune location active</div>';
+}
+
+function renderParc(){
+  const s=(document.getElementById('parc-s')?.value||'').toLowerCase();
+  const f=document.getElementById('parc-f')?.value||'';
+  const engs=DB.engins().filter(e=>(!s||(e.nom+e.mod).toLowerCase().includes(s))&&(!f||e.stat===f));
+  const all=DB.engins();
+  document.getElementById('parc-kpi').innerHTML=
+    kpiBox('o',all.length,'TOTAL','')+
+    kpiBox('g',all.filter(e=>e.stat==='Disponible').length,'DISPONIBLE','')+
+    kpiBox('b',all.filter(e=>e.stat==='Loué').length,'LOUÉ','')+
+    kpiBox('r',all.filter(e=>e.stat==='Maintenance').length,'MAINTENANCE','')+
+    kpiBox('y',all.filter(e=>e.stat==='Transit').length,'TRANSIT','');
+
+  const maxCA=Math.max(...all.map(e=>e.ca||0),1);
+  document.getElementById('parc-tbody').innerHTML=engs.length?engs.map(e=>{
+    const d=e.cert?Math.ceil((new Date(e.cert)-new Date())/86400000):999;
+    const cc=d<0?'var(--red)':d<30?'var(--yellow)':'var(--muted2)';
+    const pct=Math.round(((e.ca||0)/maxCA)*100);
+    return '<tr>'+
+      '<td><strong>'+e.nom+'</strong><br><span style="font-size:11px;color:var(--muted2)">'+e.mod+'</span></td>'+
+      '<td class="mn" style="color:var(--orange);font-weight:700">'+e.cap+'T</td>'+
+      '<td style="font-size:12px">'+e.type+'</td>'+
+      '<td><span class="bdg '+statClass(e.stat)+'">'+e.stat+'</span></td>'+
+      '<td>'+(e.op||'—')+'</td>'+
+      '<td class="mn" style="text-align:center">'+(e.jours||0)+'</td>'+
+      '<td class="mn" style="color:var(--green)">'+CFA(e.ca)+'</td>'+
+      '<td class="mn" style="color:'+cc+';font-size:11px">'+(e.cert||'N/A')+(d<30&&d>=0?' ('+d+'j)':d<0?' ⚠️':'')+'</td>'+
+      '<td class="mn" style="font-size:10px;color:var(--muted2)">'+N(e.tj)+'/'+N(e.th)+'/'+N(e.tm)+'</td>'+
+      '<td class="mn">'+(e.conso||'?')+' L/H</td>'+
+      '<td style="white-space:nowrap">'+
+        '<button class="btn btn-g btn-sm" style="margin-right:4px" onclick="ouvrirStatut(\''+e.id+'\')">📋 Statut</button>'+
+        '<button class="btn btn-b btn-sm" style="margin-right:4px" onclick="editEngin(\''+e.id+'\')">✏️</button>'+
+        '<button class="btn btn-r btn-sm" onclick="deleteEngin(\''+e.id+'\')">🗑️</button>'+
+      '</td>'+
+    '</tr>';
+  }).join(''):'<tr><td colspan="11" class="empty">Aucun engin trouvé</td></tr>';
+}
+
+function renderLocs(){
+  const s=(document.getElementById('loc-s')?.value||'').toLowerCase();
+  const ft=document.getElementById('loc-ft')?.value||'';
+  const fs=document.getElementById('loc-fs')?.value||'';
+  const locs=DB.locs().filter(l=>{
+    const ms=!s||(l.cl+l.eng+(l.site||'')).toLowerCase().includes(s);
+    return ms&&(!ft||l.type===ft)&&(!fs||l.stat===fs);
+  });
+  const all=DB.locs();
+  const ca=all.reduce((s,l)=>s+(+l.total||0),0);
+  document.getElementById('loc-kpi').innerHTML=
+    kpiBox('o',all.length,'TOTAL','')+
+    kpiBox('g',all.filter(l=>l.stat==='En cours').length,'EN COURS','')+
+    kpiBox('b',N(ca),'CA TOTAL (CFA)','','font-size:18px;color:var(--blue)')+
+    kpiBox('y',all.filter(l=>l.esc==='Oui').length,'AVEC ESCORTE','');
+
+  document.getElementById('loc-tbody').innerHTML=locs.length?locs.map(l=>{
+    const enCours=l.stat==='En cours';
+    return '<tr>'+
+      '<td class="mn" style="font-size:10px;color:var(--muted2)">'+l.id+'</td>'+
+      '<td><strong>'+l.cl+'</strong></td>'+
+      '<td class="mn">'+l.eng+'</td>'+
+      '<td><span class="bdg '+typeClass(l.type)+'">'+l.type+'</span></td>'+
+      '<td class="mn">'+l.deb+'</td>'+
+      '<td class="mn">'+(l.fin||'—')+'</td>'+
+      '<td class="mn">'+CFA(l.tarif)+'</td>'+
+      '<td class="mn" style="color:var(--green);font-weight:700">'+CFA(l.total||l.tarif)+'</td>'+
+      '<td><span class="bdg '+(enCours?'loue':'dispo')+'">'+(enCours?'En cours':'Terminé')+'</span></td>'+
+      '<td>'+(l.esc==='Oui'?'<span class="bdg transit">🚔 OUI</span>':'<span style="color:var(--muted)">Non</span>')+'</td>'+
+      '<td style="font-size:11px">'+(l.site||'—')+'</td>'+
+      '<td style="white-space:nowrap">'+
+        (enCours?
+          '<button class="btn btn-r btn-sm" style="margin-right:4px" onclick="cloturer(\''+l.id+'\')">🔒 Clôturer</button>'+
+          '<button class="btn btn-b btn-sm" onclick="ouvrirProlong(\''+l.id+'\')">📅 Prolonger</button>'
+          :'<span style="color:var(--muted);font-size:11px">Terminée</span>')+
+      '</td>'+
+    '</tr>';
+  }).join(''):'<tr><td colspan="12" class="empty">Aucune location</td></tr>';
+}
+
+function renderFuel(){
+  const s=(document.getElementById('fuel-s')?.value||'').toLowerCase();
+  const fuels=DB.fuels().filter(f=>!s||(f.eng+f.op).toLowerCase().includes(s));
+  const all=DB.fuels();
+  const totL=all.reduce((s,f)=>s+f.lit,0);
+  const totC=all.reduce((s,f)=>s+(f.lit*f.prix),0);
+  document.getElementById('fuel-kpi').innerHTML=
+    kpiBox('y',N(totL),'LITRES TOTAL','consommés','font-size:22px;color:var(--yellow)')+
+    kpiBox('r',N(totC),'COÛT TOTAL (CFA)','','font-size:18px;color:var(--red)')+
+    kpiBox('b',all.length,'RAVITAILLEMENTS','');
+
+  const byEng={};
+  all.forEach(f=>{if(!byEng[f.eng])byEng[f.eng]={lit:0,cost:0,n:0};byEng[f.eng].lit+=f.lit;byEng[f.eng].cost+=f.lit*f.prix;byEng[f.eng].n++});
+  const sorted=Object.entries(byEng).sort((a,b)=>b[1].lit-a[1].lit);
+  const maxL=sorted[0]?.[1]?.lit||1;
+  const engs=DB.engins();
+  document.getElementById('fuel-rank').innerHTML=sorted.map(([nom,d],i)=>{
+    const e=engs.find(x=>x.nom===nom);
+    return '<div class="rc"><div class="rb">#'+(i+1)+'</div>'+
+      '<div class="rn">'+nom+'</div>'+
+      '<div class="rc-cap">'+(e?.mod||'')+' · Conso théo: '+(e?.conso||'?')+' L/H</div>'+
+      '<div class="rs"><span class="rs-l">Total litres</span><span class="rs-v" style="color:var(--yellow)">'+N(d.lit)+' L</span></div>'+
+      '<div class="rs"><span class="rs-l">Coût total</span><span class="rs-v" style="color:var(--red)">'+CFA(d.cost)+'</span></div>'+
+      '<div class="rs"><span class="rs-l">Ravitaillements</span><span class="rs-v">'+d.n+'</span></div>'+
+      '<div class="rbar"><div class="rfill" style="width:'+Math.round((d.lit/maxL)*100)+'%;background:linear-gradient(90deg,var(--yellow),var(--orange))"></div></div>'+
+    '</div>';
+  }).join('');
+
+  document.getElementById('fuel-tbody').innerHTML=fuels.length?fuels.map(f=>
+    '<tr>'+
+    '<td class="mn">'+f.date+'</td>'+
+    '<td><strong>'+f.eng+'</strong></td>'+
+    '<td class="mn" style="color:var(--yellow)">'+N(f.lit)+' L</td>'+
+    '<td class="mn">'+N(f.prix)+'</td>'+
+    '<td class="mn" style="color:var(--red)">'+CFA(f.lit*f.prix)+'</td>'+
+    '<td class="mn">'+N(f.cpt)+' h</td>'+
+    '<td>'+f.op+'</td>'+
+    '<td style="font-size:11px;color:var(--muted2)">'+f.notes+'</td>'+
+    '</tr>').join(''):'<tr><td colspan="8" class="empty">Aucune saisie</td></tr>';
+}
+
+function renderEsc(){
+  const s=(document.getElementById('esc-s')?.value||'').toLowerCase();
+  const escs=DB.escs().filter(e=>!s||(e.eng+e.cl+e.traj).toLowerCase().includes(s));
+  const all=DB.escs();
+  const tc=all.reduce((s,e)=>s+(+e.cout||0),0);
+  const tf=all.reduce((s,e)=>s+(+e.fact||0),0);
+  document.getElementById('esc-kpi').innerHTML=
+    kpiBox('b',all.length,'ESCORTES TOTAL','')+
+    kpiBox('r',N(tc),'COÛT GEND. (CFA)','','font-size:18px;color:var(--red)')+
+    kpiBox('g',N(tf),'FACTURÉ CLIENT (CFA)','','font-size:18px;color:var(--green)')+
+    kpiBox('o',N(tf-tc),'MARGE ESCORTES (CFA)','','font-size:18px;color:var(--orange)');
+
+  document.getElementById('esc-tbody').innerHTML=escs.length?escs.map(e=>{
+    const mg=(+e.fact||0)-(+e.cout||0);
+    const sc=e.stat==='Payé'?'var(--green)':e.stat==='Facturé'?'var(--yellow)':'var(--muted2)';
+    return '<tr>'+
+      '<td class="mn">'+e.date+'</td>'+
+      '<td class="mn">'+e.eng+'</td>'+
+      '<td style="font-size:12px">'+e.traj+'</td>'+
+      '<td class="mn">'+e.km+' km</td>'+
+      '<td class="mn" style="text-align:center">'+e.gend+'</td>'+
+      '<td class="mn" style="color:var(--red)">'+CFA(e.cout)+'</td>'+
+      '<td class="mn" style="color:var(--green)">'+CFA(e.fact)+'</td>'+
+      '<td class="mn" style="color:'+(mg>=0?'var(--green)':'var(--red)')+';font-weight:700">'+CFA(mg)+'</td>'+
+      '<td><strong>'+e.cl+'</strong></td>'+
+      '<td class="mn" style="font-size:10px;color:var(--muted2)">'+(e.ref||'—')+'</td>'+
+      '<td class="mn" style="color:'+sc+'">'+e.stat+'</td>'+
+      '<td><button class="btn btn-g btn-sm" onclick="payEsc(\''+e.date+'\',\''+e.eng+'\')">Marquer payé</button></td>'+
+    '</tr>';
+  }).join(''):'<tr><td colspan="12" class="empty">Aucune escorte</td></tr>';
+}
+
+function renderFin(){
+  const locs=DB.locs(),fuels=DB.fuels(),escs=DB.escs();
+  const ca=locs.reduce((s,l)=>s+(+l.total||0),0);
+  const fc=fuels.reduce((s,f)=>s+(f.lit*f.prix),0);
+  const ec=escs.reduce((s,e)=>s+(+e.cout||0),0);
+  const mg=ca-fc-ec;
+  const mgPct=ca>0?Math.round((mg/ca)*100):0;
+  document.getElementById('fin-kpi').innerHTML=
+    kpiBox('g',N(ca),'CA TOTAL (CFA)','','font-size:20px;color:var(--green)')+
+    kpiBox('r',N(fc),'CARBURANT (CFA)','','font-size:20px;color:var(--red)')+
+    kpiBox('y',N(ec),'ESCORTES (CFA)','','font-size:20px;color:var(--yellow)')+
+    kpiBox('o',N(mg),'MARGE BRUTE (CFA)',mgPct+'% de marge','font-size:20px;color:var(--orange)');
+
+  const byCl={};locs.forEach(l=>{byCl[l.cl]=(byCl[l.cl]||0)+(+l.total||0)});
+  document.getElementById('fin-clients').innerHTML=Object.entries(byCl).sort((a,b)=>b[1]-a[1]).map(([c,v])=>{
+    const pct=ca>0?Math.round((v/ca)*100):0;
+    return '<tr><td><strong>'+c+'</strong></td><td class="mn" style="color:var(--green)">'+CFA(v)+'</td>'+
+      '<td><div style="display:flex;align-items:center;gap:6px"><div style="width:70px;height:4px;background:var(--border2);border-radius:2px"><div style="width:'+pct+'%;height:100%;background:var(--green);border-radius:2px"></div></div><span class="mn" style="font-size:10px">'+pct+'%</span></div></td></tr>';
+  }).join('');
+
+  const byEng={};locs.forEach(l=>{byEng[l.eng]=(byEng[l.eng]||0)+(+l.total||0)});
+  const fByEng={};fuels.forEach(f=>{fByEng[f.eng]=(fByEng[f.eng]||0)+(f.lit*f.prix)});
+  document.getElementById('fin-engins').innerHTML=Object.entries(byEng).sort((a,b)=>b[1]-a[1]).map(([nom,rev])=>{
+    const fuel=fByEng[nom]||0;const mg=rev>0?Math.round(((rev-fuel)/rev)*100):0;
+    const mc=mg>50?'var(--green)':mg>20?'var(--yellow)':'var(--red)';
+    return '<tr><td class="mn">'+nom+'</td><td class="mn" style="color:var(--green)">'+CFA(rev)+'</td><td class="mn" style="color:var(--red)">'+CFA(fuel)+'</td><td class="mn" style="color:'+mc+';font-weight:700">'+mg+'%</td></tr>';
+  }).join('');
+
+  const mois=['Janv.','Févr.','Mars','Avr.','Mai','Juin','Juil.','Août','Sept.','Oct.','Nov.','Déc.'];
+  document.getElementById('fin-month').innerHTML=mois.map((m,i)=>{
+    const mm=String(i+1).padStart(2,'0');
+    const mca=locs.filter(l=>l.deb&&l.deb.startsWith('2025-'+mm)).reduce((s,l)=>s+(+l.total||0),0);
+    const mec=escs.filter(e=>e.date&&e.date.startsWith('2025-'+mm)).reduce((s,e)=>s+(+e.cout||0),0);
+    const mfc=fuels.filter(f=>f.date&&f.date.startsWith('2025-'+mm)).reduce((s,f)=>s+(f.lit*f.prix),0);
+    const mg=mca-mec-mfc;const pct=mca>0?Math.round((mg/mca)*100):0;
+    const mc=pct>50?'var(--green)':pct>20?'var(--yellow)':mca>0?'var(--red)':'var(--muted)';
+    return '<tr>'+
+      '<td><strong>'+m+'</strong></td>'+
+      '<td class="mn" style="color:'+(mca?'var(--green)':'var(--muted)')+'">'+(mca?CFA(mca):'—')+'</td>'+
+      '<td class="mn" style="color:'+(mec?'var(--yellow)':'var(--muted)')+'">'+(mec?CFA(mec):'—')+'</td>'+
+      '<td class="mn" style="color:'+(mfc?'var(--red)':'var(--muted)')+'">'+(mfc?CFA(mfc):'—')+'</td>'+
+      '<td class="mn" style="color:'+mc+';font-weight:700">'+(mca?CFA(mg):'—')+'</td>'+
+      '<td class="mn" style="color:'+mc+'">'+(mca?pct+'%':'—')+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+// ══ HELPERS ══════════════════════════════════════════
+function kpiBox(cls,val,lbl,sub,vstyle){
+  return '<div class="kpi '+cls+'"><div class="kpi-lbl">'+lbl+'</div><div class="kpi-val" style="'+(vstyle||'color:var(--text)')+'">'+val+'</div>'+(sub?'<div class="kpi-sub">'+sub+'</div>':'')+'</div>';
+}
+function statClass(s){return s==='Loué'?'loue':s==='Disponible'?'dispo':s==='Maintenance'?'maint':'transit'}
+function typeClass(t){return t==='Journalière'?'jour':t==='Hebdomadaire'?'sem':'mois'}
+
+// ══ CLOCK ════════════════════════════════════════════
+setInterval(()=>{
+  document.getElementById('clock').textContent=new Date().toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+},1000);
+
+// ══ INIT ════════════════════════════════════════════
+seed();renderDB();
+</script>
+</body>
+</html>
