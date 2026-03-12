@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VIA LOGISTICS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0c0e13;--sur:#13161f;--pan:#1a1e2a;--card:#1f2435;--brd:#252b3b;--brd2:#2f374d;
+  --or:#e8722a;--ord:rgba(232,114,42,.12);--bl:#3b8fe8;--bld:rgba(59,143,232,.12);
+  --gr:#2ecf7a;--grd:rgba(46,207,122,.12);--rd:#e84545;--rdd:rgba(232,69,69,.12);
+  --yl:#f5b731;--yld:rgba(245,183,49,.12);--pu:#a855f7;--pud:rgba(168,85,247,.12);
+  --tl:#00c9a7;--tld:rgba(0,201,167,.12);--tx:#e2e6f0;--mu:#5a6278;--mu2:#8892a4;
+  --mn:'IBM Plex Mono',monospace;--ss:'IBM Plex Sans',sans-serif;--dp:'Bebas Neue',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--ss);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--brd) 1px,transparent 1px),linear-gradient(90deg,var(--brd) 1px,transparent 1px);
+  background-size:48px 48px;opacity:.13}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.lb{background:var(--pan);border:1px solid var(--brd2);border-radius:12px;padding:40px;width:100%;max-width:420px;text-align:center}
+.ll{font-family:var(--dp);font-size:36px;letter-spacing:6px;color:var(--or);margin-bottom:6px}
+.ls{font-family:var(--mn);font-size:11px;color:var(--mu2);letter-spacing:2px;margin-bottom:32px}
+.lb label{text-align:left;display:block;font-family:var(--mn);font-size:10px;color:var(--mu2);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.lb input{width:100%;background:var(--bg);border:1px solid var(--brd2);border-radius:6px;padding:12px;color:var(--tx);font-size:14px;outline:none;margin-bottom:16px}
+.lb input:focus{border-color:var(--or)}
+.lerr{color:var(--rd);font-size:12px;margin-bottom:12px;font-family:var(--mn);display:none}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:200;height:60px;background:rgba(12,14,19,.96);
+  border-bottom:2px solid var(--or);backdrop-filter:blur(16px);display:flex;align-items:center;padding:0 20px;gap:16px}
+.logo{font-family:var(--dp);font-size:24px;letter-spacing:4px;color:var(--or)}
+.lsb{font-family:var(--mn);font-size:10px;color:var(--mu2);letter-spacing:2px}
+.hr{margin-left:auto;display:flex;align-items:center;gap:14px}
+.lp{display:flex;align-items:center;gap:6px;background:var(--grd);border:1px solid rgba(46,207,122,.3);border-radius:20px;padding:4px 10px}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--gr);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 6px var(--gr)}50%{opacity:.3;box-shadow:none}}
+.lt{font-family:var(--mn);font-size:10px;color:var(--gr);letter-spacing:1px}
+#clk{font-family:var(--mn);font-size:12px;color:var(--mu2)}
+.ut{font-family:var(--mn);font-size:11px;color:var(--or);background:var(--ord);border:1px solid rgba(232,114,42,.3);padding:4px 10px;border-radius:4px;cursor:pointer}
+
+/* NAV */
+nav{position:sticky;top:60px;z-index:190;background:var(--sur);border-bottom:1px solid var(--brd2);display:flex;padding:0 8px;overflow-x:auto}
+nav::-webkit-scrollbar{height:3px}nav::-webkit-scrollbar-thumb{background:var(--brd2)}
+.nb{background:none;border:none;cursor:pointer;color:var(--mu2);font-family:var(--ss);font-size:11px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;padding:13px 14px;border-bottom:3px solid transparent;
+  transition:all .2s;white-space:nowrap;position:relative}
+.nb:hover{color:var(--tx)}.nb.active{color:var(--or);border-bottom-color:var(--or)}
+.nb .badge{position:absolute;top:6px;right:6px;background:var(--rd);color:#fff;
+  font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;
+  font-family:var(--mn);display:none}
+.nb .badge.show{display:inline-block}
+
+/* MAIN */
+main{position:relative;z-index:1;padding:20px;max-width:1440px;margin:0 auto}
+.pg{display:none}.pg.active{display:block}
+
+/* KPI */
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.kc{background:var(--card);border:1px solid var(--brd2);border-radius:8px;padding:16px;position:relative;overflow:hidden;transition:transform .2s}
+.kc:hover{transform:translateY(-2px)}.kc.click{cursor:pointer}
+.kc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kc.o::after{background:var(--or)}.kc.b::after{background:var(--bl)}.kc.g::after{background:var(--gr)}
+.kc.r::after{background:var(--rd)}.kc.y::after{background:var(--yl)}.kc.p::after{background:var(--pu)}.kc.t::after{background:var(--tl)}
+.kl{font-family:var(--mn);font-size:9px;color:var(--mu2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.kv{font-family:var(--dp);font-size:32px;line-height:1}
+.ks{font-family:var(--mn);font-size:10px;color:var(--mu);margin-top:4px}
+
+/* SECTION */
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:14px;margin-top:22px}
+.sh h2{font-family:var(--dp);font-size:20px;letter-spacing:2px}
+.tg{font-family:var(--mn);font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:3px}
+.tg.o{background:var(--ord);color:var(--or);border:1px solid rgba(232,114,42,.3)}
+.tg.b{background:var(--bld);color:var(--bl);border:1px solid rgba(59,143,232,.3)}
+.tg.g{background:var(--grd);color:var(--gr);border:1px solid rgba(46,207,122,.3)}
+.tg.r{background:var(--rdd);color:var(--rd);border:1px solid rgba(232,69,69,.3)}
+.tg.y{background:var(--yld);color:var(--yl);border:1px solid rgba(245,183,49,.3)}
+
+/* TABLE */
+.tw{background:var(--card);border:1px solid var(--brd2);border-radius:8px;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th{background:var(--pan);font-family:var(--mn);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--mu2);padding:12px 14px;text-align:left;border-bottom:1px solid var(--brd2);white-space:nowrap}
+td{padding:10px 14px;font-size:12px;border-bottom:1px solid var(--brd);vertical-align:middle}
+tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)}
+.mn2{font-family:var(--mn);font-size:11px}
+.bd{display:inline-block;font-family:var(--mn);font-size:10px;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.bd.dsp{background:var(--grd);color:var(--gr);border:1px solid rgba(46,207,122,.3)}
+.bd.lou{background:var(--ord);color:var(--or);border:1px solid rgba(232,114,42,.3)}
+.bd.mnt{background:var(--rdd);color:var(--rd);border:1px solid rgba(232,69,69,.3)}
+.bd.trn{background:var(--bld);color:var(--bl);border:1px solid rgba(59,143,232,.3)}
+.bd.jou{background:var(--yld);color:var(--yl)}.bd.sem{background:var(--bld);color:var(--bl)}.bd.moi{background:var(--pud);color:var(--pu)}
+.bd.out{background:var(--grd);color:var(--gr)}.bd.inp{background:var(--pud);color:var(--pu)}
+.bd.ok{background:var(--grd);color:var(--gr)}.bd.exp{background:var(--rdd);color:var(--rd)}.bd.wrn{background:var(--yld);color:var(--yl)}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.ov.open{display:flex}
+.md{background:var(--pan);border:1px solid var(--brd2);border-radius:10px;padding:28px;width:100%;max-width:620px;max-height:88vh;overflow-y:auto;position:relative}
+.md h3{font-family:var(--dp);font-size:22px;letter-spacing:2px;margin-bottom:20px;color:var(--or)}
+.mc{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--mu2);font-size:20px;cursor:pointer}
+.mc:hover{color:var(--tx)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fg .fl{grid-column:1/-1}
+label{display:block;font-family:var(--mn);font-size:10px;letter-spacing:1px;color:var(--mu2);margin-bottom:5px;text-transform:uppercase}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--brd2);border-radius:6px;padding:10px 12px;color:var(--tx);font-family:var(--ss);font-size:13px;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--or)}
+select option{background:var(--pan)}textarea{resize:vertical;min-height:65px}
+
+/* BUTTONS */
+.btn{padding:10px 20px;border-radius:6px;font-family:var(--ss);font-weight:600;font-size:13px;cursor:pointer;border:none;transition:all .2s}
+.bp{background:var(--or);color:#fff}.bp:hover{background:#d4621f}
+.bg{background:transparent;color:var(--mu2);border:1px solid var(--brd2)}.bg:hover{color:var(--tx)}
+.br{background:var(--rdd);color:var(--rd);border:1px solid rgba(232,69,69,.3)}
+.bb{background:var(--bld);color:var(--bl);border:1px solid rgba(59,143,232,.3)}
+.by{background:var(--yld);color:var(--yl);border:1px solid rgba(245,183,49,.3)}
+.bg2{background:var(--grd);color:var(--gr);border:1px solid rgba(46,207,122,.3)}
+.bsm{padding:6px 12px;font-size:11px}
+.fa{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--brd2)}
+
+/* TOOLBAR */
+.tb{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.tbl{display:flex;gap:8px;flex:1;flex-wrap:wrap}
+.si{background:var(--card);border:1px solid var(--brd2);border-radius:6px;padding:8px 14px;color:var(--tx);font-size:13px;outline:none;min-width:160px;flex:1;max-width:280px}
+.si:focus{border-color:var(--or)}
+.sf{background:var(--card);border:1px solid var(--brd2);border-radius:6px;padding:8px 12px;color:var(--tx);font-size:12px;outline:none}
+
+/* RANK CARDS */
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+.rc{background:var(--card);border:1px solid var(--brd2);border-radius:8px;padding:18px;position:relative;overflow:hidden;transition:transform .2s}
+.rc:hover{transform:translateY(-2px)}
+.rb{position:absolute;top:10px;right:14px;font-family:var(--dp);font-size:40px;opacity:.1}
+.rn{font-weight:700;font-size:14px;margin-bottom:3px}
+.rc2{font-family:var(--mn);font-size:10px;color:var(--or);letter-spacing:1px;margin-bottom:12px}
+.rs{display:flex;justify-content:space-between;margin-bottom:5px}
+.rsl{font-size:11px;color:var(--mu2)}.rsv{font-family:var(--mn);font-size:11px;font-weight:600}
+.rbar{height:4px;background:var(--brd2);border-radius:2px;margin-top:10px;overflow:hidden}
+.rfill{height:100%;border-radius:2px}
+
+/* ALERTS */
+.al{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.ai{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--brd2);border-radius:6px;padding:12px 16px;border-left:3px solid}
+.ai.ro{border-left-color:var(--rd)}.ai.ja{border-left-color:var(--yl)}.ai.bl{border-left-color:var(--bl)}.ai.ve{border-left-color:var(--gr)}
+.adot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ro .adot{background:var(--rd)}.ja .adot{background:var(--yl)}.bl .adot{background:var(--bl)}.ve .adot{background:var(--gr)}
+.at{flex:1;font-size:12px}.adt{font-family:var(--mn);font-size:10px;color:var(--mu)}
+
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-box{background:var(--card);border:1px solid var(--brd2);border-radius:8px;padding:20px}
+.chart-title{font-family:var(--dp);font-size:16px;letter-spacing:2px;margin-bottom:16px;color:var(--tx)}
+
+/* JOURNAL */
+.log-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--brd)}
+.log-item:last-child{border-bottom:none}
+.log-user{font-family:var(--mn);font-size:10px;color:var(--or);font-weight:600;min-width:80px}
+.log-action{font-size:12px;flex:1}
+.log-time{font-family:var(--mn);font-size:10px;color:var(--mu)}
+
+/* FACTURE */
+#facture-preview{background:#fff;color:#000;padding:40px;border-radius:8px;font-family:var(--ss)}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;font-weight:600;font-size:13px;padding:12px 20px;border-radius:8px;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;background:var(--gr);color:#000}
+#toast.show{transform:translateY(0);opacity:1}#toast.err{background:var(--rd);color:#fff}
+.emp{text-align:center;padding:40px;color:var(--mu);font-family:var(--mn);font-size:12px}
+@media(max-width:640px){.lsb,.ut{display:none}.fg{grid-template-columns:1fr}main{padding:12px}.chart-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="lb">
+    <div class="ll">VIA LOGISTICS</div>
+    <div class="ls">DAKAR · SÉNÉGAL</div>
+    <div id="lerr" class="lerr"></div>
+    <div><label>Email</label><input id="lemail" type="email" placeholder="prenom@vialogistics.sn"/></div>
+    <div><label>Mot de passe</label><input id="lpwd" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="btn bp" style="width:100%;padding:14px" onclick="doLogin()">Se connecter</button>
+    <p style="font-family:var(--mn);font-size:10px;color:var(--mu);margin-top:16px">Via Logistics — Système de Gestion Opérationnelle v9.0</p>
+  </div>
+</div>
+
+<header style="display:none" id="hdr">
+  <div class="logo">VIA LOGISTICS</div>
+  <div class="lsb">DAKAR · SÉNÉGAL</div>
+  <div class="hr">
+    <div class="lp"><div class="ldot"></div><span class="lt">EN LIGNE</span></div>
+    <span id="clk"></span>
+    <div class="ut" id="utag" onclick="doLogout()">SAM FALL ▾</div>
+  </div>
+</header>
+
+<nav style="display:none" id="mnav">
+  <button class="nb active" onclick="go('db')" id="nav-db">📊 Dashboard<span class="badge" id="badge-db"></span></button>
+  <button class="nb" onclick="go('parc')" id="nav-parc">🏗️ Parc Engins<span class="badge" id="badge-parc"></span></button>
+  <button class="nb" onclick="go('loc')" id="nav-loc">📋 Locations<span class="badge" id="badge-loc"></span></button>
+  <button class="nb" onclick="go('fuel')" id="nav-fuel">⛽ Carburant<span class="badge" id="badge-fuel"></span></button>
+  <button class="nb" onclick="go('esc')" id="nav-esc">🚔 Escortes<span class="badge" id="badge-esc"></span></button>
+  <button class="nb" onclick="go('pers')" id="nav-pers">👷 Personnel<span class="badge" id="badge-pers"></span></button>
+  <button class="nb" onclick="go('hse')" id="nav-hse">🦺 HSE<span class="badge" id="badge-hse"></span></button>
+  <button class="nb" onclick="go('fin')" id="nav-fin">💰 Financier</button>
+  <button class="nb" onclick="go('journal')" id="nav-journal">📒 Journal</button>
+</nav>
+
+<main style="display:none" id="mcontent">
+
+<!-- DASHBOARD -->
+<div class="pg active" id="pg-db">
+  <div class="kr" id="db-kr"></div>
+  <div class="chart-grid">
+    <div class="chart-box">
+      <div class="chart-title">CA MENSUEL 2025</div>
+      <canvas id="chart-ca" height="180"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">CARBURANT PAR FOURNISSEUR</div>
+      <canvas id="chart-fuel" height="180"></canvas>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+    <div>
+      <div class="sh"><h2>LOCATIONS EN COURS</h2><span class="tg g" id="db-lc-tag">0</span></div>
+      <div id="db-locs"></div>
+    </div>
+    <div>
+      <div class="sh"><h2>ALERTES</h2><span class="tg r">URGENT</span></div>
+      <div class="al" id="db-al"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PARC -->
+<div class="pg" id="pg-parc">
+  <div class="tb">
+    <div class="tbl">
+      <input class="si" id="ps" placeholder="🔍 Rechercher..." oninput="rParc()"/>
+      <select class="sf" id="pf" onchange="rParc()">
+        <option value="">Tous statuts</option>
+        <option>Disponible</option><option>Loué</option><option>Maintenance</option><option>Transit</option>
+      </select>
+    </div>
+    <button class="btn bp bsm" id="btn-add-eng" onclick="oM('m-eng')">+ Ajouter engin</button>
+  </div>
+  <div class="kr" id="parc-kr"></div>
+  <div class="tw"><table>
+    <thead><tr><th>ENGIN</th><th>CAP.</th><th>TYPE</th><th>STATUT</th><th>JOURS</th><th>CA (CFA)</th><th>VGP</th><th>TARIF J/H/M</th><th>CONSO</th><th>ACTIONS</th></tr></thead>
+    <tbody id="parc-tb"></tbody>
+  </table></div>
+</div>
+
+<!-- LOCATIONS -->
+<div class="pg" id="pg-loc">
+  <div class="tb">
+    <div class="tbl">
+      <input class="si" id="ls" placeholder="🔍 Client, engin..." oninput="rLoc()"/>
+      <select class="sf" id="ld" onchange="rLoc()">
+        <option value="">Sortante + Entrante</option>
+        <option value="Sortante">📤 Sortante</option>
+        <option value="Entrante">📥 Sous-traitance</option>
+      </select>
+      <select class="sf" id="lfs" onchange="rLoc()">
+        <option value="">Tous statuts</option><option>En cours</option><option>Terminé</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:6px" id="loc-btns">
+      <button class="btn bp bsm" onclick="oM('m-loc')">📤 Location sortante</button>
+      <button class="btn bb bsm" onclick="oM('m-st')">📥 Sous-traitance</button>
+    </div>
+  </div>
+  <div class="kr" id="loc-kr"></div>
+  <div class="tw"><table>
+    <thead><tr><th>RÉF.</th><th>TYPE</th><th>CLIENT/FOURN.</th><th>ENGIN</th><th>FACT.</th><th>DÉBUT</th><th>FIN</th><th>TOTAL (CFA)</th><th>STATUT</th><th>ESC.</th><th>ACTIONS</th></tr></thead>
+    <tbody id="loc-tb"></tbody>
+  </table></div>
+</div>
+
+<!-- CARBURANT -->
+<div class="pg" id="pg-fuel">
+  <div class="tb">
+    <div class="tbl">
+      <input class="si" id="fus" placeholder="🔍 Engin, fournisseur..." oninput="rFuel()"/>
+      <select class="sf" id="fuf" onchange="rFuel()">
+        <option value="">Tous fournisseurs</option>
+        <option>OLA Energy</option><option>Shell</option><option>Total Sococim</option>
+      </select>
+      <select class="sf" id="fuc" onchange="rFuel()">
+        <option value="">Tous circuits</option>
+        <option value="Direct">⛽ Direct</option>
+        <option value="Cuve">🛢️ Cuve 1000L</option>
+      </select>
+    </div>
+    <button class="btn bp bsm" id="btn-add-fuel" onclick="oM('m-fuel')">+ Saisir plein</button>
+  </div>
+  <div class="kr" id="fuel-kr"></div>
+  <div class="sh"><h2>CLASSEMENT PAR FOURNISSEUR</h2><span class="tg y">LITRES</span></div>
+  <div class="rg" id="fuel-rg"></div>
+  <div class="sh"><h2>REGISTRE DES PLEINS</h2></div>
+  <div class="tw"><table>
+    <thead><tr><th>DATE</th><th>ENGIN</th><th>FOURNISSEUR</th><th>CIRCUIT</th><th>LITRES</th><th>PRIX/L</th><th>COÛT (CFA)</th><th>COMPTEUR</th><th>OPÉRATEUR</th></tr></thead>
+    <tbody id="fuel-tb"></tbody>
+  </table></div>
+</div>
+
+<!-- ESCORTES -->
+<div class="pg" id="pg-esc">
+  <div class="tb">
+    <div class="tbl"><input class="si" id="ess" placeholder="🔍 Client, trajet..." oninput="rEsc()"/></div>
+    <button class="btn bp bsm" id="btn-add-esc" onclick="oM('m-esc')">+ Nouvelle escorte</button>
+  </div>
+  <div class="kr" id="esc-kr"></div>
+  <div class="tw"><table>
+    <thead><tr><th>DATE</th><th>ENGIN</th><th>TRAJET</th><th>KM</th><th>GEND.</th><th>COÛT</th><th>FACTURÉ</th><th>MARGE</th><th>CLIENT</th><th>STATUT</th><th>ACTIONS</th></tr></thead>
+    <tbody id="esc-tb"></tbody>
+  </table></div>
+</div>
+
+<!-- PERSONNEL -->
+<div class="pg" id="pg-pers">
+  <div class="tb">
+    <div class="tbl"><input class="si" id="prs" placeholder="🔍 Nom, poste..." oninput="rPers()"/></div>
+    <button class="btn bp bsm" id="btn-add-pers" onclick="oM('m-pers')">+ Ajouter personnel</button>
+  </div>
+  <div class="kr" id="pers-kr"></div>
+  <div class="tw"><table>
+    <thead><tr><th>NOM & PRÉNOM</th><th>POSTE</th><th>CACES</th><th>DATE OBTENTION</th><th>EXPIRATION</th><th>STATUT</th><th>TÉL.</th><th>CERTIFICAT</th><th>ACTIONS</th></tr></thead>
+    <tbody id="pers-tb"></tbody>
+  </table></div>
+</div>
+
+<!-- HSE -->
+<div class="pg" id="pg-hse">
+  <div class="kr" id="hse-kr"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <div class="sh"><h2>VGP DES ENGINS</h2><span class="tg r">6 MOIS</span></div>
+      <div class="tb" style="margin-top:0">
+        <button class="btn bp bsm" id="btn-add-vgp" onclick="oM('m-vgp')">+ Ajouter VGP</button>
+        <button class="btn bb bsm" style="margin-left:12px" id="btn-add-assu" onclick="oM('m-assu')">+ Ajouter Assurance</button>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>ENGIN</th><th>TYPE</th><th>DATE</th><th>EXPIRY</th><th>STATUT</th><th>ORGANISME</th><th>ACTION</th></tr></thead>
+        <tbody id="vgp-tb"></tbody>
+      </table></div>
+      <div class="sh" style="margin-top:20px"><h2>ASSURANCES</h2><span class="tg b">ENGINS</span></div>
+      <div class="tw"><table>
+        <thead><tr><th>ENGIN</th><th>COMPAGNIE</th><th>TYPE</th><th>EXPIRY</th><th>PRIME</th><th>STATUT</th><th>DOC.</th><th>ACTION</th></tr></thead>
+        <tbody id="assu-tb"></tbody>
+      </table></div>
+    </div>
+    <div>
+      <div class="sh"><h2>ALERTES HSE</h2><span class="tg r">EXPIRATIONS</span></div>
+      <div class="al" id="hse-al"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCIER -->
+<div class="pg" id="pg-fin">
+  <div class="kr" id="fin-kr"></div>
+  <div style="display:flex;gap:10px;margin-bottom:16px">
+    <button class="btn bp bsm" onclick="genRapport()">📊 Générer Rapport PDF Mensuel</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <div class="sh"><h2>CA PAR CLIENT</h2><span class="tg o">TOP</span></div>
+      <div class="tw"><table><thead><tr><th>CLIENT</th><th>TOTAL (CFA)</th><th>PART</th></tr></thead><tbody id="fin-cl"></tbody></table></div>
+    </div>
+    <div>
+      <div class="sh"><h2>RENTABILITÉ PAR ENGIN</h2><span class="tg b">MARGE</span></div>
+      <div class="tw"><table><thead><tr><th>ENGIN</th><th>CA</th><th>CARBURANT</th><th>MARGE %</th></tr></thead><tbody id="fin-eng"></tbody></table></div>
+    </div>
+  </div>
+  <div class="sh" style="margin-top:20px"><h2>RÉCAPITULATIF MENSUEL 2025</h2><span class="tg g">RÉSULTAT</span></div>
+  <div class="tw"><table>
+    <thead><tr><th>MOIS</th><th>CA (CFA)</th><th>SOUS-TRAIT.</th><th>ESCORTES</th><th>CARBURANT</th><th>MARGE (CFA)</th><th>MARGE %</th></tr></thead>
+    <tbody id="fin-mo"></tbody>
+  </table></div>
+</div>
+
+<!-- JOURNAL -->
+<div class="pg" id="pg-journal">
+  <div class="sh"><h2>JOURNAL D'ACTIVITÉ</h2><span class="tg b">QUI A FAIT QUOI</span></div>
+  <div class="kr" id="journal-kr"></div>
+  <div class="tw" id="journal-list" style="max-height:600px;overflow-y:auto"></div>
+</div>
+
+</main>
+
+<!-- ══════════ MODALS ══════════ -->
+<div class="ov" id="m-eng"><div class="md">
+  <button class="mc" onclick="cM('m-eng')">✕</button><h3>NOUVEL ENGIN</h3>
+  <div class="fg">
+    <div><label>Identifiant</label><input id="en" placeholder="GRUE-100T-01"/></div>
+    <div><label>Marque / Modèle</label><input id="emod" placeholder="Liebherr LTM 1100"/></div>
+    <div><label>Type</label><select id="ety"><option>Grue mobile</option><option>Grue sur camion</option><option>Camion lourd</option><option>Chariot élévateur</option></select></div>
+    <div><label>Capacité (T)</label><input id="eca" type="number" placeholder="100"/></div>
+    <div><label>Statut</label><select id="est"><option>Disponible</option><option>Loué</option><option>Maintenance</option><option>Transit</option></select></div>
+    <div><label>Conso. (L/H)</label><input id="eco" type="number" placeholder="25"/></div>
+    <div><label>Tarif Journalier (CFA)</label><input id="etj" type="number"/></div>
+    <div><label>Tarif Hebdomadaire (CFA)</label><input id="eth" type="number"/></div>
+    <div><label>Tarif Mensuel (CFA)</label><input id="etm" type="number"/></div>
+    <div><label>Date VGP/Certif.</label><input id="ect" type="date"/></div>
+    <div class="fl"><label>Notes</label><textarea id="eno"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-eng')">Annuler</button><button class="btn bp" onclick="sEng()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-edit-eng"><div class="md">
+  <button class="mc" onclick="cM('m-edit-eng')">✕</button><h3>MODIFIER ENGIN</h3>
+  <input type="hidden" id="eid"/>
+  <div class="fg">
+    <div><label>Identifiant</label><input id="een"/></div>
+    <div><label>Marque / Modèle</label><input id="eemod"/></div>
+    <div><label>Type</label><select id="eety"><option>Grue mobile</option><option>Grue sur camion</option><option>Camion lourd</option><option>Chariot élévateur</option></select></div>
+    <div><label>Capacité (T)</label><input id="eeca" type="number"/></div>
+    <div><label>Statut</label><select id="eest"><option>Disponible</option><option>Loué</option><option>Maintenance</option><option>Transit</option></select></div>
+    <div><label>Conso. (L/H)</label><input id="eeco" type="number"/></div>
+    <div><label>Tarif Journalier</label><input id="eetj" type="number"/></div>
+    <div><label>Tarif Hebdomadaire</label><input id="eeth" type="number"/></div>
+    <div><label>Tarif Mensuel</label><input id="eetm" type="number"/></div>
+    <div><label>Date VGP/Certif.</label><input id="eect" type="date"/></div>
+    <div class="fl"><label>Notes</label><textarea id="eeno"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-edit-eng')">Annuler</button><button class="btn bp" onclick="uEng()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-stat"><div class="md" style="max-width:360px">
+  <button class="mc" onclick="cM('m-stat')">✕</button><h3>CHANGER STATUT</h3>
+  <input type="hidden" id="sid"/>
+  <p style="font-size:13px;color:var(--mu2);margin-bottom:16px">Engin : <strong id="snom" style="color:var(--or)"></strong></p>
+  <div><label>Nouveau statut</label>
+    <select id="ssel">
+      <option value="Disponible">✅ Disponible</option><option value="Loué">🔄 Loué</option>
+      <option value="Maintenance">🔧 Maintenance</option><option value="Transit">🚛 Transit</option>
+    </select>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-stat')">Annuler</button><button class="btn bp" onclick="svStat()">Confirmer</button></div>
+</div></div>
+
+<div class="ov" id="m-loc"><div class="md">
+  <button class="mc" onclick="cM('m-loc')">✕</button><h3>📤 LOCATION SORTANTE</h3>
+  <div class="fg">
+    <div class="fl"><label>Client</label><input id="lcl" placeholder="Nom entreprise cliente"/></div>
+    <div><label>Engin (votre parc)</label><select id="leng"></select></div>
+    <div><label>Opérateur</label><select id="lop"></select></div>
+    <div><label>Type facturation</label><select id="lty"><option>Journalière</option><option>Hebdomadaire</option><option>Mensuelle</option></select></div>
+    <div><label>Date début</label><input id="ldb" type="date"/></div>
+    <div><label>Date fin prévue</label><input id="lfn" type="date"/></div>
+    <div><label>Tarif appliqué (CFA)</label><input id="ltr" type="number" placeholder="500000"/></div>
+    <div><label>Site / Destination</label><input id="lsi" placeholder="Sococim, Thiès..."/></div>
+    <div><label>Escorte requise ?</label><select id="les"><option value="Non">Non</option><option value="Oui">Oui</option></select></div>
+    <div class="fl"><label>Notes</label><textarea id="lno"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-loc')">Annuler</button><button class="btn bp" onclick="sLoc()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-st"><div class="md">
+  <button class="mc" onclick="cM('m-st')">✕</button><h3>📥 SOUS-TRAITANCE</h3>
+  <div class="fg">
+    <div class="fl"><label>Fournisseur / Concurrent</label><input id="stf" placeholder="Nom du concurrent"/></div>
+    <div><label>Type d'engin loué</label><input id="steng" placeholder="ex: Grue 80T..."/></div>
+    <div><label>Client final</label><input id="stcl" placeholder="Pour quel client ?"/></div>
+    <div><label>Type facturation</label><select id="stty"><option>Journalière</option><option>Hebdomadaire</option><option>Mensuelle</option></select></div>
+    <div><label>Date début</label><input id="stdb" type="date"/></div>
+    <div><label>Date fin</label><input id="stfn" type="date"/></div>
+    <div><label>Coût sous-traitance (CFA)</label><input id="stco" type="number" placeholder="300000"/></div>
+    <div><label>Prix facturé client (CFA)</label><input id="stpr" type="number" placeholder="450000"/></div>
+    <div><label>Site</label><input id="stsi" placeholder="Site du chantier"/></div>
+    <div><label>Escorte ?</label><select id="stes"><option value="Non">Non</option><option value="Oui">Oui</option></select></div>
+    <div class="fl"><label>Notes</label><textarea id="stno"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-st')">Annuler</button><button class="btn bp" onclick="sST()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-prolong"><div class="md" style="max-width:400px">
+  <button class="mc" onclick="cM('m-prolong')">✕</button><h3>PROLONGER LOCATION</h3>
+  <input type="hidden" id="prid"/>
+  <p style="font-size:13px;color:var(--mu2);margin-bottom:4px">Client : <strong id="prcl"></strong></p>
+  <p style="font-size:13px;color:var(--mu2);margin-bottom:16px">Fin actuelle : <strong id="prfin" style="color:var(--or)"></strong></p>
+  <div class="fg">
+    <div><label>Prolonger de (jours)</label><input id="prj" type="number" value="7" oninput="calcFin()"/></div>
+    <div><label>Nouvelle date de fin</label><input id="prnf" type="date" style="opacity:.7" readonly/></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-prolong')">Annuler</button><button class="btn bp" onclick="cfProlong()">Prolonger</button></div>
+</div></div>
+
+<div class="ov" id="m-facture"><div class="md" style="max-width:700px">
+  <button class="mc" onclick="cM('m-facture')">✕</button><h3>🖨️ FACTURE CLIENT</h3>
+  <div id="facture-preview"></div>
+  <div class="fa">
+    <button class="btn bg" onclick="cM('m-facture')">Fermer</button>
+    <button class="btn bp" onclick="printFacture()">🖨️ Imprimer / PDF</button>
+  </div>
+</div></div>
+
+<div class="ov" id="m-fuel"><div class="md">
+  <button class="mc" onclick="cM('m-fuel')">✕</button><h3>SAISIE CARBURANT</h3>
+  <div class="fg">
+    <div><label>Date</label><input id="fdt" type="date"/></div>
+    <div><label>Engin</label><select id="feng"></select></div>
+    <div><label>Fournisseur</label><select id="ffo"><option>OLA Energy</option><option>Shell</option><option>Total Sococim</option></select></div>
+    <div><label>Circuit</label><select id="fci"><option value="Direct">⛽ Direct station</option><option value="Cuve">🛢️ Via cuve 1000L</option></select></div>
+    <div><label>Litres</label><input id="fli" type="number" placeholder="200"/></div>
+    <div><label>Prix/Litre (CFA)</label><input id="fpr" type="number" value="850"/></div>
+    <div><label>Compteur (h)</label><input id="fcp" type="number" placeholder="1250"/></div>
+    <div><label>Opérateur</label><select id="fop"></select></div>
+    <div class="fl"><label>Notes</label><textarea id="fno"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-fuel')">Annuler</button><button class="btn bp" onclick="sFuel()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-esc"><div class="md">
+  <button class="mc" onclick="cM('m-esc')">✕</button><h3>ESCORTE GENDARMERIE</h3>
+  <div class="fg">
+    <div><label>Date</label><input id="edt" type="date"/></div>
+    <div><label>Engin</label><select id="eeng"></select></div>
+    <div class="fl"><label>Trajet</label><input id="etr" placeholder="Dakar → Thiès"/></div>
+    <div><label>Distance (km)</label><input id="ekm" type="number" placeholder="70"/></div>
+    <div><label>Nb. gendarmes</label><input id="ege" type="number" placeholder="4"/></div>
+    <div><label>Coût gendarmerie (CFA)</label><input id="eco2" type="number" placeholder="150000"/></div>
+    <div><label>Client à facturer</label><input id="ecl" placeholder="Nom du client"/></div>
+    <div><label>Montant facturé (CFA)</label><input id="efa" type="number" placeholder="200000"/></div>
+    <div><label>Référence location</label><input id="erf" placeholder="LOC-2025-001"/></div>
+    <div><label>Statut paiement</label><select id="estt"><option>En attente</option><option>Facturé</option><option>Payé</option></select></div>
+    <div class="fl"><label>Notes</label><textarea id="eno2"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-esc')">Annuler</button><button class="btn bp" onclick="sEsc()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-pers"><div class="md">
+  <button class="mc" onclick="cM('m-pers')">✕</button><h3>AJOUTER PERSONNEL</h3>
+  <div class="fg">
+    <div><label>Prénom</label><input id="ppr" placeholder="Mamadou"/></div>
+    <div><label>Nom</label><input id="pno" placeholder="Diallo"/></div>
+    <div><label>Poste</label><select id="ppo"><option>Grutier</option><option>Conducteur PL</option><option>Rigger</option><option>Mécanicien</option><option>Chef d'équipe</option><option>Agent HSE</option><option>Autre</option></select></div>
+    <div><label>Type CACES</label><input id="pca" placeholder="CACES R482..."/></div>
+    <div><label>Date obtention CACES</label><input id="pcd" type="date"/></div>
+    <div><label>Téléphone</label><input id="pte" placeholder="77 000 0000"/></div>
+    <div class="fl"><label>Certificat CACES (PDF/JPEG)</label>
+      <input id="pcf" type="file" accept=".pdf,.jpg,.jpeg,.png" style="padding:8px;font-size:12px"/>
+    </div>
+    <div class="fl"><label>Notes</label><textarea id="pnt"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-pers')">Annuler</button><button class="btn bp" onclick="sPers()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-edit-pers"><div class="md">
+  <button class="mc" onclick="cM('m-edit-pers')">✕</button><h3>MODIFIER PERSONNEL</h3>
+  <input type="hidden" id="epid"/>
+  <div class="fg">
+    <div><label>Prénom</label><input id="eppr"/></div>
+    <div><label>Nom</label><input id="epno"/></div>
+    <div><label>Poste</label><select id="eppo"><option>Grutier</option><option>Conducteur PL</option><option>Rigger</option><option>Mécanicien</option><option>Chef d'équipe</option><option>Agent HSE</option><option>Autre</option></select></div>
+    <div><label>Type CACES</label><input id="epca"/></div>
+    <div><label>Date renouvellement CACES</label><input id="epcd" type="date"/></div>
+    <div><label>Téléphone</label><input id="epte"/></div>
+    <div class="fl"><label>Nouveau certificat (optionnel)</label>
+      <input id="epcf" type="file" accept=".pdf,.jpg,.jpeg,.png" style="padding:8px;font-size:12px"/>
+    </div>
+    <div class="fl"><label>Notes</label><textarea id="epnt"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-edit-pers')">Annuler</button><button class="btn bp" onclick="uPers()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-vgp"><div class="md">
+  <button class="mc" onclick="cM('m-vgp')">✕</button><h3>AJOUTER VGP</h3>
+  <div class="fg">
+    <div><label>Engin</label><select id="veng"></select></div>
+    <div><label>Type de VGP</label><select id="vty"><option>VGP Grue</option><option>VGP Chariot</option><option>Contrôle technique</option><option>Inspection hydraulique</option><option>Révision générale</option></select></div>
+    <div><label>Date de la VGP</label><input id="vdt" type="date"/></div>
+    <div><label>Validité (mois)</label><input id="vva" type="number" value="6"/></div>
+    <div class="fl"><label>Organisme</label><input id="vor" placeholder="Bureau Veritas, Apave..."/></div>
+    <div class="fl"><label>Notes</label><textarea id="vno"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-vgp')">Annuler</button><button class="btn bp" onclick="sVGP()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-assu"><div class="md">
+  <button class="mc" onclick="cM('m-assu')">✕</button><h3>AJOUTER ASSURANCE</h3>
+  <div class="fg">
+    <div><label>Engin assuré</label><select id="aeng"></select></div>
+    <div><label>Compagnie</label><input id="aco" placeholder="NSIA, Allianz..."/></div>
+    <div><label>Type</label><select id="aty"><option>Tous risques</option><option>Responsabilité civile</option><option>Bris de machine</option><option>Transport</option><option>Autre</option></select></div>
+    <div><label>N° Police</label><input id="apo"/></div>
+    <div><label>Date début</label><input id="adb" type="date"/></div>
+    <div><label>Date expiration</label><input id="aex" type="date"/></div>
+    <div><label>Prime annuelle (CFA)</label><input id="apr" type="number"/></div>
+    <div class="fl"><label>Police d'assurance (PDF/JPEG)</label>
+      <input id="afl" type="file" accept=".pdf,.jpg,.jpeg,.png" style="padding:8px;font-size:12px"/>
+    </div>
+    <div class="fl"><label>Notes</label><textarea id="ano"></textarea></div>
+  </div>
+  <div class="fa"><button class="btn bg" onclick="cM('m-assu')">Annuler</button><button class="btn bp" onclick="sAssu()">Enregistrer</button></div>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+// ═══ SUPABASE ════════════════════════════════════
+var SB_URL='https://kgwfhmutocqqiifvvsos.supabase.co';
+var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtnd2ZobXV0b2NxcWlpZnZ2c29zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNTAyODksImV4cCI6MjA4ODkyNjI4OX0.aS1XJoisGxzOYtfAwUO8OOrkuRhg_4lkSHSNeFYZ9k8';
+
+// ═══ USERS ══════════════════════════════════════
+var USERS={
+  'sam@vialogistics.sn':    {pwd:'ViaLogistics2025!',  role:'superadmin', name:'Sam Fall'},
+  'sady@vialogistics.sn':   {pwd:'Sady2025!',          role:'admin',      name:'Sady'},
+  'moussa@vialogistics.sn': {pwd:'Moussa2025!',        role:'ops',        name:'Moussa'},
+  'niang@vialogistics.sn':  {pwd:'Niang2025!',         role:'analyste',   name:'Niang'},
+  'diagne@vialogistics.sn': {pwd:'Diagne2025!',        role:'hse',        name:'Diagne'},
+};
+
+// ROLE PERMISSIONS
+var PERMS={
+  superadmin:{tabs:['db','parc','loc','fuel','esc','pers','hse','fin','journal'],canAdd:true,canEdit:true,canDelete:true,fuelCuve:false},
+  admin:     {tabs:['db','parc','loc','fuel','esc','pers','hse','fin','journal'],canAdd:true,canEdit:true,canDelete:false,fuelCuve:false},
+  ops:       {tabs:['db','parc','loc','fuel','esc','journal'],                  canAdd:true,canEdit:true,canDelete:false,fuelCuve:false},
+  analyste:  {tabs:['db'],                                                      canAdd:false,canEdit:false,canDelete:false,fuelCuve:false},
+  hse:       {tabs:['db','hse','pers','fuel','journal'],                        canAdd:true,canEdit:true,canDelete:false,fuelCuve:true},
+};
+
+var CU=null; // current user
+var DATA={engins:[],locations:[],carburant:[],escortes:[],personnel:[],vgp:[],assurances:[]};
+var JOURNAL=[];
+var COUNTERS={loc:0,st:0,esc:0};
+var chartCA=null,chartFuel=null;
+
+// ═══ AUTH ════════════════════════════════════════
+function doLogin(){
+  var email=document.getElementById('lemail').value.trim().toLowerCase();
+  var pwd=document.getElementById('lpwd').value;
+  var u=USERS[email];
+  var err=document.getElementById('lerr');
+  if(!u||u.pwd!==pwd){err.style.display='block';err.textContent='❌ Email ou mot de passe incorrect';return;}
+  CU={email:email,role:u.role,name:u.name};
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('hdr').style.display='flex';
+  document.getElementById('mnav').style.display='flex';
+  document.getElementById('mcontent').style.display='block';
+  document.getElementById('utag').textContent=u.name.toUpperCase()+' ('+u.role+') ▾';
+  applyPerms();
+  loadAll();
+  logAction('Connexion');
+}
+
+function doLogout(){
+  if(!confirm('Se déconnecter ?'))return;
+  logAction('Déconnexion');
+  CU=null;
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('hdr').style.display='none';
+  document.getElementById('mnav').style.display='none';
+  document.getElementById('mcontent').style.display='none';
+  document.getElementById('lemail').value='';
+  document.getElementById('lpwd').value='';
+}
+
+function applyPerms(){
+  var p=PERMS[CU.role];
+  // Hide non-allowed tabs
+  ['db','parc','loc','fuel','esc','pers','hse','fin','journal'].forEach(function(t){
+    var nb=document.getElementById('nav-'+t);
+    if(nb)nb.style.display=p.tabs.indexOf(t)>=0?'':'none';
+  });
+  // Carburant Diagne : only Cuve circuit
+  if(CU.role==='hse'){
+    var fci=document.getElementById('fci');
+    if(fci){
+      fci.innerHTML='<option value="Cuve">🛢️ Via cuve 1000L</option>';
+    }
+  }
+}
+
+function can(action){return CU&&PERMS[CU.role][action]}
+
+// ═══ SUPABASE API ════════════════════════════════
+function sbFetch(table,method,body,filter){
+  var url=SB_URL+'/rest/v1/'+table+(filter?'?'+filter:'');
+  var opts={method:method||'GET',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':''}};
+  if(body)opts.body=JSON.stringify(body);
+  return fetch(url,opts).then(function(r){
+    if(!r.ok)return r.text().then(function(t){throw new Error(t)});
+    return r.text().then(function(t){return t?JSON.parse(t):[]});
+  });
+}
+function sbGet(t){return sbFetch(t,'GET')}
+function sbIns(t,d){return sbFetch(t,'POST',d)}
+function sbUpd(t,id,d){return sbFetch(t,'PATCH',d,'id=eq.'+id)}
+function sbDel(t,id){return sbFetch(t,'DELETE',null,'id=eq.'+id)}
+
+// ═══ JOURNAL ═════════════════════════════════════
+function logAction(action,detail){
+  var now=new Date();
+  JOURNAL.unshift({
+    user:CU?CU.name:'Système',role:CU?CU.role:'',
+    action:action,detail:detail||'',
+    time:now.toLocaleString('fr-FR')
+  });
+  if(JOURNAL.length>200)JOURNAL.pop();
+}
+
+// ═══ AUTO NUMBERING ══════════════════════════════
+function nextRef(prefix){
+  var yr=new Date().getFullYear();
+  COUNTERS[prefix]=(COUNTERS[prefix]||0)+1;
+  return prefix.toUpperCase()+'-'+yr+'-'+String(COUNTERS[prefix]).padStart(3,'0');
+}
+function initCounters(){
+  DATA.locations.forEach(function(l){
+    var m=l.id?l.id.match(/(\d+)$/):null;
+    if(m){
+      var n=parseInt(m[1]);
+      var pfx=l.direction==='Entrante'?'st':'loc';
+      if(n>COUNTERS[pfx])COUNTERS[pfx]=n;
+    }
+  });
+  DATA.escortes.forEach(function(e){
+    var m=e.id?e.id.match(/(\d+)$/):null;
+    if(m){var n=parseInt(m[1]);if(n>COUNTERS.esc)COUNTERS.esc=n;}
+  });
+}
+
+// ═══ LOAD ALL ════════════════════════════════════
+function loadAll(){
+  toast('⏳ Chargement...');
+  Promise.all([
+    sbGet('engins').then(function(d){DATA.engins=d}),
+    sbGet('locations').then(function(d){DATA.locations=d}),
+    sbGet('carburant').then(function(d){DATA.carburant=d}),
+    sbGet('escortes').then(function(d){DATA.escortes=d}),
+    sbGet('personnel').then(function(d){DATA.personnel=d}),
+    sbGet('vgp').then(function(d){DATA.vgp=d}),
+    sbGet('assurances').then(function(d){DATA.assurances=d}),
+  ]).then(function(){
+    initCounters();
+    updateBadges();
+    toast('✅ Données chargées');
+    rDB();
+  }).catch(function(e){toast('❌ Erreur: '+e.message,true)});
+}
+
+// ═══ BADGES ALERTES ══════════════════════════════
+function updateBadges(){
+  var alerts=getAlerts();
+  var urgent=alerts.filter(function(a){return a.t==='ro'}).length;
+  var warn=alerts.filter(function(a){return a.t==='ja'}).length;
+
+  // Dashboard badge
+  var db=document.getElementById('badge-db');
+  if(db){db.textContent=urgent+warn;db.className='badge'+(urgent+warn>0?' show':'');}
+
+  // HSE badge (VGP + CACES alerts)
+  var hseAl=alerts.filter(function(a){return a.src==='vgp'||a.src==='caces'});
+  var hb=document.getElementById('badge-hse');
+  if(hb){hb.textContent=hseAl.length;hb.className='badge'+(hseAl.length>0?' show':'');}
+
+  // Personnel badge
+  var persAl=alerts.filter(function(a){return a.src==='caces'});
+  var pb=document.getElementById('badge-pers');
+  if(pb){pb.textContent=persAl.length;pb.className='badge'+(persAl.length>0?' show':'');}
+
+  // Locations badge (overdue)
+  var locAl=DATA.locations.filter(function(l){return l.statut==='En cours'&&l.date_fin&&new Date(l.date_fin)<new Date()}).length;
+  var lb=document.getElementById('badge-loc');
+  if(lb){lb.textContent=locAl;lb.className='badge'+(locAl>0?' show':'');}
+}
+
+function getAlerts(){
+  var alerts=[];
+  DATA.engins.forEach(function(e){
+    if(e.certif){var d=dLeft(e.certif);
+      if(d<0)alerts.push({t:'ro',m:'🔴 VGP EXPIRÉE — '+e.nom,d:e.certif,src:'vgp'});
+      else if(d<30)alerts.push({t:'ja',m:'⚠️ VGP expire dans '+d+'j — '+e.nom,d:e.certif,src:'vgp'});}
+    if(e.statut==='Maintenance')alerts.push({t:'ro',m:'🔧 Maintenance — '+e.nom,d:'En cours',src:'engin'});
+  });
+  DATA.vgp.forEach(function(v){
+    if(!v.date_vgp)return;var ex=addM(v.date_vgp,v.validite_mois);var d=dLeft(ex);
+    if(d<0)alerts.push({t:'ro',m:'🔴 VGP EXPIRÉE — '+v.engin+' ('+v.type_vgp+')',d:ex,src:'vgp'});
+    else if(d<30)alerts.push({t:'ja',m:'⚠️ VGP expire dans '+d+'j — '+v.engin,d:ex,src:'vgp'});
+  });
+  DATA.personnel.forEach(function(p){
+    if(!p.caces_date)return;var ex=addY(p.caces_date,1);var d=dLeft(ex);
+    if(d<0)alerts.push({t:'ro',m:'🔴 CACES EXPIRÉ — '+p.prenom+' '+p.nom,d:ex,src:'caces'});
+    else if(d<30)alerts.push({t:'ja',m:'⚠️ CACES expire dans '+d+'j — '+p.prenom+' '+p.nom,d:ex,src:'caces'});
+  });
+  DATA.assurances.forEach(function(a){
+    if(!a.date_expiry)return;var d=dLeft(a.date_expiry);
+    if(d<0)alerts.push({t:'ro',m:'🔴 ASSURANCE EXPIRÉE — '+a.engin,d:a.date_expiry,src:'assu'});
+    else if(d<60)alerts.push({t:'ja',m:'⚠️ Assurance expire dans '+d+'j — '+a.engin,d:a.date_expiry,src:'assu'});
+  });
+  return alerts;
+}
+
+// ═══ UTILS ═══════════════════════════════════════
+function N(n){return n?Number(n).toLocaleString('fr-FR'):'0'}
+function CFA(n){return N(n)+' CFA'}
+function toast(m,e){var t=document.getElementById('toast');t.textContent=m;t.className='show'+(e?' err':'');setTimeout(function(){t.className=''},3000)}
+function today(){return new Date().toISOString().split('T')[0]}
+function addM(ds,m){var d=new Date(ds);d.setMonth(d.getMonth()+m);return d.toISOString().split('T')[0]}
+function addY(ds,y){var d=new Date(ds);d.setFullYear(d.getFullYear()+y);return d.toISOString().split('T')[0]}
+function dLeft(ds){return ds?Math.ceil((new Date(ds)-new Date())/86400000):999}
+function sCert(ds){
+  var d=dLeft(ds);
+  if(d<0)return{c:'exp',t:'EXPIRÉ',col:'var(--rd)'};
+  if(d<30)return{c:'wrn',t:d+'j restants',col:'var(--yl)'};
+  return{c:'ok',t:'Valide',col:'var(--gr)'};
+}
+function stC(s){return s==='Loué'?'lou':s==='Disponible'?'dsp':s==='Maintenance'?'mnt':'trn'}
+function tyC(t){return t==='Journalière'?'jou':t==='Hebdomadaire'?'sem':'moi'}
+
+// ═══ NAV ═════════════════════════════════════════
+function go(name){
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('active')});
+  document.getElementById('pg-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  var fn={db:rDB,parc:rParc,loc:rLoc,fuel:rFuel,esc:rEsc,pers:rPers,hse:rHSE,fin:rFin,journal:rJournal};
+  if(fn[name])fn[name]();
+}
+
+// ═══ MODALS ══════════════════════════════════════
+function oM(id){
+  var engs=DATA.engins;var pers=DATA.personnel;
+  ['leng','feng','eeng','veng','aeng'].forEach(function(sid){
+    var s=document.getElementById(sid);if(!s)return;
+    s.innerHTML=engs.map(function(e){return '<option value="'+e.nom+'">'+e.nom+' ('+e.capacite+'T)</option>'}).join('');
+  });
+  ['lop','fop'].forEach(function(sid){
+    var s=document.getElementById(sid);if(!s)return;
+    s.innerHTML='<option value="">-- Sélectionner --</option>'+pers.map(function(p){return '<option>'+p.prenom+' '+p.nom+'</option>'}).join('');
+  });
+  ['fdt','edt','ldb','lfn','stdb','stfn','vdt','adb','aex'].forEach(function(sid){
+    var el=document.getElementById(sid);if(el&&!el.value)el.value=today();
+  });
+  // HSE role : force Cuve circuit
+  if(CU&&CU.role==='hse'){
+    var fc=document.getElementById('fci');
+    if(fc)fc.value='Cuve';
+  }
+  document.getElementById(id).classList.add('open');
+}
+function cM(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.ov').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('open')})});
+
+// ═══ ENGINS ══════════════════════════════════════
+function sEng(){
+  if(!can('canAdd')){toast('⛔ Accès refusé',true);return}
+  var n=document.getElementById('en').value.trim();
+  if(!n){toast('Identifiant requis',true);return}
+  var rec={id:'ENG-'+Date.now(),nom:n,modele:document.getElementById('emod').value,
+    type:document.getElementById('ety').value,capacite:+document.getElementById('eca').value||0,
+    statut:document.getElementById('est').value,conso:+document.getElementById('eco').value||0,
+    tarif_j:+document.getElementById('etj').value||0,tarif_h:+document.getElementById('eth').value||0,
+    tarif_m:+document.getElementById('etm').value||0,certif:document.getElementById('ect').value||null,
+    notes:document.getElementById('eno').value,jours:0,ca:0};
+  sbIns('engins',rec).then(function(){
+    DATA.engins.push(rec);cM('m-eng');
+    logAction('Ajout engin',n);
+    toast('✅ Engin ajouté');rParc();updateBadges();
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+function editEng(id){
+  if(!can('canEdit')){toast('⛔ Accès refusé',true);return}
+  var e=DATA.engins.find(function(x){return x.id===id});if(!e)return;
+  document.getElementById('eid').value=e.id;
+  document.getElementById('een').value=e.nom||'';document.getElementById('eemod').value=e.modele||'';
+  document.getElementById('eeca').value=e.capacite||'';document.getElementById('eeco').value=e.conso||'';
+  document.getElementById('eetj').value=e.tarif_j||'';document.getElementById('eeth').value=e.tarif_h||'';
+  document.getElementById('eetm').value=e.tarif_m||'';document.getElementById('eect').value=e.certif||'';
+  document.getElementById('eeno').value=e.notes||'';
+  document.getElementById('eety').value=e.type||'Grue mobile';document.getElementById('eest').value=e.statut||'Disponible';
+  document.getElementById('m-edit-eng').classList.add('open');
+}
+
+function uEng(){
+  var id=document.getElementById('eid').value;
+  var upd={nom:document.getElementById('een').value,modele:document.getElementById('eemod').value,
+    type:document.getElementById('eety').value,capacite:+document.getElementById('eeca').value||0,
+    statut:document.getElementById('eest').value,conso:+document.getElementById('eeco').value||0,
+    tarif_j:+document.getElementById('eetj').value||0,tarif_h:+document.getElementById('eeth').value||0,
+    tarif_m:+document.getElementById('eetm').value||0,certif:document.getElementById('eect').value||null,
+    notes:document.getElementById('eeno').value};
+  sbUpd('engins',id,upd).then(function(){
+    var idx=DATA.engins.findIndex(function(x){return x.id===id});
+    if(idx>=0)DATA.engins[idx]=Object.assign({},DATA.engins[idx],upd);
+    cM('m-edit-eng');logAction('Modification engin',upd.nom);toast('✅ Engin mis à jour');rParc();
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+function delEng(id){
+  if(!can('canDelete')){toast('⛔ Seul Sam Fall peut supprimer',true);return}
+  var e=DATA.engins.find(function(x){return x.id===id});if(!e)return;
+  if(confirm('Supprimer "'+e.nom+'" définitivement ?')){
+    sbDel('engins',id).then(function(){
+      DATA.engins=DATA.engins.filter(function(x){return x.id!==id});
+      logAction('Suppression engin',e.nom);toast('🗑️ Engin supprimé');rParc();
+    }).catch(function(e){toast('❌ '+e.message,true)});
+  }
+}
+
+function oStat(id){
+  var e=DATA.engins.find(function(x){return x.id===id});if(!e)return;
+  document.getElementById('sid').value=id;document.getElementById('snom').textContent=e.nom;
+  document.getElementById('ssel').value=e.statut;document.getElementById('m-stat').classList.add('open');
+}
+
+function svStat(){
+  var id=document.getElementById('sid').value;var ns=document.getElementById('ssel').value;
+  sbUpd('engins',id,{statut:ns}).then(function(){
+    var e=DATA.engins.find(function(x){return x.id===id});
+    if(e){logAction('Changement statut',e.nom+' → '+ns);e.statut=ns;}
+    cM('m-stat');toast('✅ Statut : '+ns);rParc();updateBadges();
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+// ═══ LOCATIONS ═══════════════════════════════════
+function sLoc(){
+  if(!can('canAdd')){toast('⛔ Accès refusé',true);return}
+  var cl=document.getElementById('lcl').value.trim();
+  if(!cl){toast('Client requis',true);return}
+  var db=document.getElementById('ldb').value;var fn=document.getElementById('lfn').value;
+  var tr=+document.getElementById('ltr').value||0;var ty=document.getElementById('lty').value;
+  var u=1;
+  if(db&&fn){var d=(new Date(fn)-new Date(db))/86400000;
+    u=ty==='Journalière'?Math.max(1,d):ty==='Hebdomadaire'?Math.max(1,Math.ceil(d/7)):Math.max(1,Math.ceil(d/30));}
+  COUNTERS.loc=(COUNTERS.loc||0)+1;
+  var ref='LOC-'+new Date().getFullYear()+'-'+String(COUNTERS.loc).padStart(3,'0');
+  var rec={id:ref,direction:'Sortante',client:cl,engin:document.getElementById('leng').value,
+    operateur:document.getElementById('lop').value,type_fact:ty,date_debut:db||null,date_fin:fn||null,
+    tarif:tr,total:tr*u,cout:0,site:document.getElementById('lsi').value,
+    escorte:document.getElementById('les').value,statut:'En cours',notes:document.getElementById('lno').value};
+  sbIns('locations',rec).then(function(){
+    DATA.locations.push(rec);cM('m-loc');logAction('Nouvelle location',ref+' — '+cl);
+    toast('✅ Location '+ref+' créée');rLoc();updateBadges();
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+function sST(){
+  if(!can('canAdd')){toast('⛔ Accès refusé',true);return}
+  var fo=document.getElementById('stf').value.trim();if(!fo){toast('Fournisseur requis',true);return}
+  var db=document.getElementById('stdb').value;var fn=document.getElementById('stfn').value;
+  var co=+document.getElementById('stco').value||0;var pr=+document.getElementById('stpr').value||0;
+  var ty=document.getElementById('stty').value;var u=1;
+  if(db&&fn){var d=(new Date(fn)-new Date(db))/86400000;
+    u=ty==='Journalière'?Math.max(1,d):ty==='Hebdomadaire'?Math.max(1,Math.ceil(d/7)):Math.max(1,Math.ceil(d/30));}
+  COUNTERS.st=(COUNTERS.st||0)+1;
+  var ref='ST-'+new Date().getFullYear()+'-'+String(COUNTERS.st).padStart(3,'0');
+  var rec={id:ref,direction:'Entrante',fournisseur:fo,client:document.getElementById('stcl').value,
+    engin:document.getElementById('steng').value,type_fact:ty,date_debut:db||null,date_fin:fn||null,
+    tarif:pr,total:pr*u,cout:co*u,site:document.getElementById('stsi').value,
+    escorte:document.getElementById('stes').value,statut:'En cours',notes:document.getElementById('stno').value};
+  sbIns('locations',rec).then(function(){
+    DATA.locations.push(rec);cM('m-st');logAction('Sous-traitance',ref+' — '+fo);
+    toast('✅ Sous-traitance '+ref);rLoc();
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+function clot(id){
+  var l=DATA.locations.find(function(x){return x.id===id});
+  if(!l||l.statut==='Terminé'){toast('Déjà terminée',true);return}
+  if(confirm('Clôturer '+id+' ?')){
+    sbUpd('locations',id,{statut:'Terminé'}).then(function(){
+      l.statut='Terminé';logAction('Clôture location',id);rLoc();toast('✅ Clôturée');updateBadges();
+    }).catch(function(e){toast('❌ '+e.message,true)});
+  }
+}
+
+function oProlong(id){
+  var l=DATA.locations.find(function(x){return x.id===id});if(!l)return;
+  document.getElementById('prid').value=id;
+  document.getElementById('prcl').textContent=l.client||l.fournisseur||'';
+  document.getElementById('prfin').textContent=l.date_fin||'—';
+  document.getElementById('prj').value=7;calcFin();
+  document.getElementById('m-prolong').classList.add('open');
+}
+
+function calcFin(){
+  var id=document.getElementById('prid').value;
+  var l=DATA.locations.find(function(x){return x.id===id});if(!l)return;
+  var j=parseInt(document.getElementById('prj').value||0);
+  var b=l.date_fin?new Date(l.date_fin):new Date();b.setDate(b.getDate()+j);
+  document.getElementById('prnf').value=b.toISOString().split('T')[0];
+}
+
+function cfProlong(){
+  var id=document.getElementById('prid').value;
+  var j=parseInt(document.getElementById('prj').value||0);if(!j){toast('Jours requis',true);return}
+  var l=DATA.locations.find(function(x){return x.id===id});if(!l)return;
+  var b=l.date_fin?new Date(l.date_fin):new Date();b.setDate(b.getDate()+j);
+  var nf=b.toISOString().split('T')[0];
+  var diff=(new Date(nf)-new Date(l.date_debut))/86400000;
+  var u=l.type_fact==='Journalière'?Math.max(1,diff):l.type_fact==='Hebdomadaire'?Math.max(1,Math.ceil(diff/7)):Math.max(1,Math.ceil(diff/30));
+  var upd={date_fin:nf,total:(l.tarif||0)*u};
+  sbUpd('locations',id,upd).then(function(){
+    Object.assign(l,upd);cM('m-prolong');
+    logAction('Prolongation',id+' → '+nf);toast('📅 Prolongée jusqu\'au '+nf);rLoc();
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+// FACTURE
+function genFacture(id){
+  var l=DATA.locations.find(function(x){return x.id===id});if(!l)return;
+  var dateNow=new Date().toLocaleDateString('fr-FR');
+  var html='<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #e8722a;padding-bottom:20px;margin-bottom:30px">';
+  html+='<div><div style="font-size:28px;font-weight:900;color:#e8722a;letter-spacing:4px">VIA LOGISTICS</div>';
+  html+='<div style="font-size:12px;color:#666">Dakar, Sénégal • Location d\'engins de levage</div></div>';
+  html+='<div style="text-align:right"><div style="font-size:20px;font-weight:700">FACTURE</div>';
+  html+='<div style="font-size:14px;color:#e8722a;font-weight:700">'+l.id+'</div>';
+  html+='<div style="font-size:12px;color:#666">Date : '+dateNow+'</div></div></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-bottom:30px">';
+  html+='<div><div style="font-size:11px;color:#999;text-transform:uppercase;margin-bottom:8px">Facturé à</div>';
+  html+='<div style="font-size:16px;font-weight:700">'+(l.client||'—')+'</div></div>';
+  html+='<div><div style="font-size:11px;color:#999;text-transform:uppercase;margin-bottom:8px">Détails</div>';
+  html+='<div style="font-size:12px"><strong>Engin :</strong> '+l.engin+'</div>';
+  html+='<div style="font-size:12px"><strong>Site :</strong> '+(l.site||'—')+'</div>';
+  html+='<div style="font-size:12px"><strong>Période :</strong> '+(l.date_debut||'—')+' → '+(l.date_fin||'—')+'</div></div></div>';
+  html+='<table style="width:100%;border-collapse:collapse;margin-bottom:30px">';
+  html+='<thead><tr style="background:#f5f5f5"><th style="padding:12px;text-align:left;font-size:12px">DÉSIGNATION</th><th style="padding:12px;text-align:center;font-size:12px">TYPE</th><th style="padding:12px;text-align:right;font-size:12px">MONTANT (CFA)</th></tr></thead>';
+  html+='<tbody><tr style="border-bottom:1px solid #eee">';
+  html+='<td style="padding:12px;font-size:14px">Location '+l.engin+'</td>';
+  html+='<td style="padding:12px;text-align:center;font-size:12px">'+l.type_fact+'</td>';
+  html+='<td style="padding:12px;text-align:right;font-size:14px;font-weight:700">'+N(l.total||l.tarif)+'</td></tr>';
+  if(l.escorte==='Oui'){
+    html+='<tr style="border-bottom:1px solid #eee"><td style="padding:12px;font-size:14px">Escorte gendarmerie</td>';
+    html+='<td style="padding:12px;text-align:center;font-size:12px">Service</td>';
+    html+='<td style="padding:12px;text-align:right;font-size:14px">À facturer séparément</td></tr>';
+  }
+  html+='</tbody></table>';
+  html+='<div style="background:#f9f9f9;padding:20px;border-radius:8px;text-align:right">';
+  html+='<div style="font-size:20px;font-weight:700">TOTAL : '+N(l.total||l.tarif)+' CFA</div>';
+  html+='<div style="font-size:12px;color:#666;margin-top:4px">Paiement à 30 jours</div></div>';
+  html+='<div style="margin-top:40px;font-size:11px;color:#999;text-align:center;border-top:1px solid #eee;padding-top:20px">';
+  html+='Via Logistics — Dakar, Sénégal • sam@vialogistics.sn</div></div>';
+  document.getElementById('facture-preview').innerHTML=html;
+  document.getElementById('m-facture').classList.add('open');
+  logAction('Génération facture',l.id);
+}
+
+function printFacture(){
+  var content=document.getElementById('facture-preview').innerHTML;
+  var w=window.open('','_blank');
+  w.document.write('<html><head><title>Facture Via Logistics</title></head><body style="margin:20px">'+content+'</body></html>');
+  w.document.close();w.print();
+}
+
+// ═══ CARBURANT ═══════════════════════════════════
+function sFuel(){
+  if(!can('canAdd')){toast('⛔ Accès refusé',true);return}
+  var li=+document.getElementById('fli').value||0;if(!li){toast('Litres requis',true);return}
+  var ci=document.getElementById('fci').value;
+  // HSE can only use Cuve
+  if(CU.role==='hse'&&ci!=='Cuve'){toast('⛔ Vous pouvez saisir uniquement via Cuve 1000L',true);return}
+  var rec={id:'FUEL-'+Date.now(),date_plein:document.getElementById('fdt').value||null,
+    engin:document.getElementById('feng').value,fournisseur:document.getElementById('ffo').value,
+    circuit:ci,litres:li,prix_litre:+document.getElementById('fpr').value||850,
+    compteur:+document.getElementById('fcp').value||0,operateur:document.getElementById('fop').value,
+    notes:document.getElementById('fno').value};
+  sbIns('carburant',rec).then(function(){
+    DATA.carburant.push(rec);cM('m-fuel');
+    logAction('Saisie carburant',rec.engin+' — '+li+'L ('+ci+')');
+    toast('✅ Plein enregistré');rFuel();
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+// ═══ ESCORTES ════════════════════════════════════
+function sEsc(){
+  if(!can('canAdd')){toast('⛔ Accès refusé',true);return}
+  COUNTERS.esc=(COUNTERS.esc||0)+1;
+  var ref='ESC-'+new Date().getFullYear()+'-'+String(COUNTERS.esc).padStart(3,'0');
+  var rec={id:ref,date_esc:document.getElementById('edt').value||null,
+    engin:document.getElementById('eeng').value,trajet:document.getElementById('etr').value,
+    km:+document.getElementById('ekm').value||0,gendarmes:+document.getElementById('ege').value||0,
+    cout:+document.getElementById('eco2').value||0,client:document.getElementById('ecl').value,
+    facture:+document.getElementById('efa').value||0,ref_loc:document.getElementById('erf').value,
+    statut:document.getElementById('estt').value,notes:document.getElementById('eno2').value};
+  sbIns('escortes',rec).then(function(){
+    DATA.escortes.push(rec);cM('m-esc');logAction('Nouvelle escorte',ref);
+    toast('✅ Escorte '+ref);rEsc();
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+function chgEsc(id,nst){
+  if(nst==='Payé'&&!confirm('Confirmer le paiement de cette escorte ?'))return;
+  sbUpd('escortes',id,{statut:nst}).then(function(){
+    var e=DATA.escortes.find(function(x){return x.id===id});
+    if(e){logAction('Statut escorte',id+' → '+nst);e.statut=nst;}
+    rEsc();toast('✅ Statut : '+nst);
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+// ═══ PERSONNEL ═══════════════════════════════════
+function sPers(){
+  if(!can('canAdd')){toast('⛔ Accès refusé',true);return}
+  var pr=document.getElementById('ppr').value.trim();var no=document.getElementById('pno').value.trim();
+  if(!pr||!no){toast('Prénom et Nom requis',true);return}
+  var fi=document.getElementById('pcf');
+  function doSave(cf,cn){
+    var rec={id:'PERS-'+Date.now(),prenom:pr,nom:no,poste:document.getElementById('ppo').value,
+      caces:document.getElementById('pca').value,caces_date:document.getElementById('pcd').value||null,
+      telephone:document.getElementById('pte').value,cert_file:cf,cert_name:cn,
+      notes:document.getElementById('pnt').value};
+    sbIns('personnel',rec).then(function(){
+      DATA.personnel.push(rec);cM('m-pers');logAction('Ajout personnel',pr+' '+no);
+      toast('✅ Personnel ajouté');rPers();updateBadges();
+    }).catch(function(e){toast('❌ '+e.message,true)});
+  }
+  if(fi&&fi.files.length>0){var f=fi.files[0];var r=new FileReader();r.onload=function(e){doSave(e.target.result,f.name)};r.readAsDataURL(f);}
+  else doSave(null,null);
+}
+
+function editPers(id){
+  if(!can('canEdit')){toast('⛔ Accès refusé',true);return}
+  var p=DATA.personnel.find(function(x){return x.id===id});if(!p)return;
+  document.getElementById('epid').value=p.id;document.getElementById('eppr').value=p.prenom||'';
+  document.getElementById('epno').value=p.nom||'';document.getElementById('epca').value=p.caces||'';
+  document.getElementById('epcd').value=p.caces_date||'';document.getElementById('epte').value=p.telephone||'';
+  document.getElementById('epnt').value=p.notes||'';document.getElementById('eppo').value=p.poste||'Grutier';
+  document.getElementById('m-edit-pers').classList.add('open');
+}
+
+function uPers(){
+  var id=document.getElementById('epid').value;var fi=document.getElementById('epcf');
+  function doUpd(cf,cn){
+    var upd={prenom:document.getElementById('eppr').value,nom:document.getElementById('epno').value,
+      poste:document.getElementById('eppo').value,caces:document.getElementById('epca').value,
+      caces_date:document.getElementById('epcd').value||null,telephone:document.getElementById('epte').value,
+      notes:document.getElementById('epnt').value};
+    if(cf)upd.cert_file=cf;if(cn)upd.cert_name=cn;
+    sbUpd('personnel',id,upd).then(function(){
+      var idx=DATA.personnel.findIndex(function(x){return x.id===id});
+      if(idx>=0)DATA.personnel[idx]=Object.assign({},DATA.personnel[idx],upd);
+      cM('m-edit-pers');logAction('Modification personnel',upd.prenom+' '+upd.nom);
+      toast('✅ Mis à jour');rPers();updateBadges();
+    }).catch(function(e){toast('❌ '+e.message,true)});
+  }
+  if(fi&&fi.files.length>0){var f=fi.files[0];var r=new FileReader();r.onload=function(e){doUpd(e.target.result,f.name)};r.readAsDataURL(f);}
+  else doUpd(null,null);
+}
+
+function delPers(id){
+  if(!can('canDelete')){toast('⛔ Seul Sam Fall peut supprimer',true);return}
+  var p=DATA.personnel.find(function(x){return x.id===id});if(!p)return;
+  if(confirm('Supprimer '+p.prenom+' '+p.nom+' ?')){
+    sbDel('personnel',id).then(function(){
+      DATA.personnel=DATA.personnel.filter(function(x){return x.id!==id});
+      logAction('Suppression personnel',p.prenom+' '+p.nom);toast('🗑️ Supprimé');rPers();
+    }).catch(function(e){toast('❌ '+e.message,true)});
+  }
+}
+
+// ═══ VGP & ASSURANCES ════════════════════════════
+function sVGP(){
+  if(!can('canAdd')){toast('⛔ Accès refusé',true);return}
+  var en=document.getElementById('veng').value;if(!en){toast('Engin requis',true);return}
+  var rec={id:'VGP-'+Date.now(),engin:en,type_vgp:document.getElementById('vty').value,
+    date_vgp:document.getElementById('vdt').value||null,validite_mois:+document.getElementById('vva').value||6,
+    organisme:document.getElementById('vor').value,notes:document.getElementById('vno').value};
+  sbIns('vgp',rec).then(function(){
+    DATA.vgp.push(rec);cM('m-vgp');logAction('Ajout VGP',en);toast('✅ VGP ajoutée');rHSE();updateBadges();
+  }).catch(function(e){toast('❌ '+e.message,true)});
+}
+
+function delVGP(id){
+  if(!can('canDelete')){toast('⛔ Seul Sam Fall peut supprimer',true);return}
+  if(confirm('Supprimer cette VGP ?')){
+    sbDel('vgp',id).then(function(){
+      DATA.vgp=DATA.vgp.filter(function(x){return x.id!==id});
+      logAction('Suppression VGP','');toast('🗑️ VGP supprimée');rHSE();
+    }).catch(function(e){toast('❌ '+e.message,true)});
+  }
+}
+
+function sAssu(){
+  if(!can('canAdd')){toast('⛔ Accès refusé',true);return}
+  var en=document.getElementById('aeng').value;if(!en){toast('Engin requis',true);return}
+  var fi=document.getElementById('afl');
+  function doSave(fd,fn){
+    var rec={id:'ASSU-'+Date.now(),engin:en,compagnie:document.getElementById('aco').value,
+      type_ass:document.getElementById('aty').value,num_police:document.getElementById('apo').value,
+      date_debut:document.getElementById('adb').value||null,date_expiry:document.getElementById('aex').value||null,
+      prime:+document.getElementById('apr').value||0,notes:document.getElementById('ano').value,file_data:fd,file_name:fn};
+    sbIns('assurances',rec).then(function(){
+      DATA.assurances.push(rec);cM('m-assu');logAction('Ajout assurance',en);
+      toast('✅ Assurance ajoutée');rHSE();updateBadges();
+    }).catch(function(e){toast('❌ '+e.message,true)});
+  }
+  if(fi&&fi.files.length>0){var f=fi.files[0];var r=new FileReader();r.onload=function(e){doSave(e.target.result,f.name)};r.readAsDataURL(f);}
+  else doSave(null,null);
+}
+
+function delAssu(id){
+  if(!can('canDelete')){toast('⛔ Seul Sam Fall peut supprimer',true);return}
+  if(confirm('Supprimer cette assurance ?')){
+    sbDel('assurances',id).then(function(){
+      DATA.assurances=DATA.assurances.filter(function(x){return x.id!==id});
+      logAction('Suppression assurance','');toast('🗑️ Supprimée');rHSE();
+    }).catch(function(e){toast('❌ '+e.message,true)});
+  }
+}
+
+// ═══ RAPPORT PDF ═════════════════════════════════
+function genRapport(){
+  var locs=DATA.locations;var fuels=DATA.carburant;var escs=DATA.escortes;
+  var now=new Date();var mois=now.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  var mm=String(now.getMonth()+1).padStart(2,'0');var yr=now.getFullYear();
+  var srt=locs.filter(function(l){return l.direction==='Sortante'&&l.date_debut&&l.date_debut.startsWith(yr+'-'+mm)});
+  var ent=locs.filter(function(l){return l.direction==='Entrante'&&l.date_debut&&l.date_debut.startsWith(yr+'-'+mm)});
+  var ca=srt.reduce(function(s,l){return s+(+l.total||0)},0);
+  var stC=ent.reduce(function(s,l){return s+(+l.cout||0)},0);
+  var fc=fuels.filter(function(f){return f.date_plein&&f.date_plein.startsWith(yr+'-'+mm)}).reduce(function(s,f){return s+((+f.litres||0)*(+f.prix_litre||0))},0);
+  var ec=escs.filter(function(e){return e.date_esc&&e.date_esc.startsWith(yr+'-'+mm)}).reduce(function(s,e){return s+(+e.cout||0)},0);
+  var mg=ca-stC-fc-ec;
+  var alerts=getAlerts();
+  var w=window.open('','_blank');
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Rapport Via Logistics — '+mois+'</title>';
+  html+='<style>body{font-family:Arial,sans-serif;margin:40px;color:#333}h1{color:#e8722a;border-bottom:3px solid #e8722a;padding-bottom:10px}';
+  html+='.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin:30px 0}';
+  html+='.kpi{background:#f9f9f9;border-radius:8px;padding:20px;text-align:center}';
+  html+='.kpi-val{font-size:24px;font-weight:900;color:#e8722a}.kpi-lbl{font-size:12px;color:#666;margin-top:4px}';
+  html+='table{width:100%;border-collapse:collapse;margin-top:20px}th{background:#e8722a;color:#fff;padding:10px;text-align:left;font-size:12px}';
+  html+='td{padding:10px;border-bottom:1px solid #eee;font-size:12px}.alert-r{color:#e84545}.alert-j{color:#f5b731}</style></head><body>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center">';
+  html+='<div><h1>RAPPORT MENSUEL</h1><p style="color:#666;margin-top:-10px">Via Logistics — '+mois+'</p></div>';
+  html+='<div style="text-align:right;font-size:12px;color:#999">Généré le '+new Date().toLocaleString('fr-FR')+'<br>Par : '+CU.name+'</div></div>';
+  html+='<div class="grid">';
+  html+='<div class="kpi"><div class="kpi-val">'+N(ca)+'</div><div class="kpi-lbl">CA LOCATIONS (CFA)</div></div>';
+  html+='<div class="kpi"><div class="kpi-val">'+N(stC)+'</div><div class="kpi-lbl">SOUS-TRAITANCE (CFA)</div></div>';
+  html+='<div class="kpi"><div class="kpi-val">'+N(fc+ec)+'</div><div class="kpi-lbl">CHARGES (CFA)</div></div>';
+  html+='<div class="kpi"><div class="kpi-val" style="color:'+(mg>=0?'#2ecf7a':'#e84545')+'">'+N(mg)+'</div><div class="kpi-lbl">MARGE BRUTE (CFA)</div></div></div>';
+  html+='<h2 style="color:#e8722a">LOCATIONS DU MOIS ('+srt.length+')</h2>';
+  html+='<table><tr><th>RÉFÉRENCE</th><th>CLIENT</th><th>ENGIN</th><th>TYPE</th><th>TOTAL (CFA)</th></tr>';
+  srt.forEach(function(l){html+='<tr><td>'+l.id+'</td><td>'+l.client+'</td><td>'+l.engin+'</td><td>'+l.type_fact+'</td><td style="font-weight:700">'+N(l.total||l.tarif)+'</td></tr>';});
+  html+='</table>';
+  if(alerts.length){
+    html+='<h2 style="color:#e84545;margin-top:30px">ALERTES ('+alerts.length+')</h2><ul>';
+    alerts.forEach(function(a){html+='<li class="alert-'+(a.t==='ro'?'r':'j')+'">'+a.m+'</li>';});
+    html+='</ul>';
+  }
+  html+='<p style="margin-top:40px;font-size:11px;color:#999;text-align:center">Via Logistics — Dakar, Sénégal</p>';
+  html+='</body></html>';
+  w.document.write(html);w.document.close();w.print();
+  logAction('Rapport PDF',mois);
+}
+
+// ═══ RENDERS ═════════════════════════════════════
+function K(cls,val,lbl,sub,vs,oc){
+  var cur=oc?'cursor:pointer':'';var cl=oc?' onclick="'+oc+'"':'';
+  var h='<div class="kc '+cls+(oc?' click':'')+'"'+cl+' style="'+cur+'">';
+  h+='<div class="kl">'+lbl+'</div><div class="kv" style="'+(vs||'color:var(--tx)')+'">'+val+'</div>';
+  if(sub)h+='<div class="ks">'+sub+'</div>';return h+'</div>';
+}
+
+function rDB(){
+  var engs=DATA.engins,locs=DATA.locations,fuels=DATA.carburant;
+  var srt=locs.filter(function(l){return l.direction==='Sortante'});
+  var ent=locs.filter(function(l){return l.direction==='Entrante'});
+  var ca=srt.reduce(function(s,l){return s+(+l.total||0)},0);
+  var stC=ent.reduce(function(s,l){return s+(+l.cout||0)},0);
+  var fc=fuels.reduce(function(s,f){return s+((+f.litres||0)*(+f.prix_litre||0))},0);
+  var act=locs.filter(function(l){return l.statut==='En cours'});
+  document.getElementById('db-kr').innerHTML=
+    K('o',engs.length,'FLOTTE','','font-size:32px;color:var(--or)',"go('parc')")+
+    K('g',engs.filter(function(e){return e.statut==='Disponible'}).length,'DISPONIBLES','','font-size:32px;color:var(--gr)',"go('parc');document.getElementById('pf').value='Disponible';rParc()")+
+    K('b',engs.filter(function(e){return e.statut==='Loué'}).length,'EN LOCATION','','font-size:32px;color:var(--bl)',"go('parc');document.getElementById('pf').value='Lou\u00e9';rParc()")+
+    K('r',engs.filter(function(e){return e.statut==='Maintenance'}).length,'MAINTENANCE','','font-size:32px;color:var(--rd)',"go('parc');document.getElementById('pf').value='Maintenance';rParc()")+
+    K('o',N(ca),'CA LOCATIONS','','font-size:18px;color:var(--or)',"go('fin')")+
+    K('p',N(stC),'SOUS-TRAITANCE','','font-size:18px;color:var(--pu)',"go('loc');document.getElementById('ld').value='Entrante';rLoc()")+
+    K('y',N(fc),'CARBURANT','','font-size:18px;color:var(--yl)',"go('fuel')");
+
+  // Charts
+  drawCharts();
+
+  // Locations actives
+  document.getElementById('db-lc-tag').textContent=act.length+' ACTIVES';
+  document.getElementById('db-locs').innerHTML=act.length?
+    '<div class="tw"><table><thead><tr><th>RÉF.</th><th>CLIENT/FOURN.</th><th>ENGIN</th><th>TYPE</th><th>FIN</th><th>TOTAL (CFA)</th></tr></thead><tbody>'+
+    act.map(function(l){
+      var isIn=l.direction==='Entrante';
+      var ov=l.date_fin&&new Date(l.date_fin)<new Date();
+      return '<tr onclick="go(\'loc\')" style="cursor:pointer'+(ov?';background:rgba(232,69,69,.05)':'')+'">' +
+        '<td class="mn2" style="font-size:10px;color:var(--mu2)">'+l.id+'</td>'+
+        '<td><strong>'+(isIn?(l.fournisseur||'—'):(l.client||'—'))+'</strong></td>'+
+        '<td class="mn2">'+l.engin+'</td>'+
+        '<td><span class="bd '+(isIn?'inp':'out')+'">'+(isIn?'📥':'📤')+'</span></td>'+
+        '<td class="mn2" style="color:'+(ov?'var(--rd)':'var(--tx)')+'">'+(l.date_fin||'—')+(ov?' ⚠️':'')+'</td>'+
+        '<td class="mn2" style="color:var(--gr);font-weight:700">'+N(l.total||l.tarif)+' CFA</td></tr>';
+    }).join('')+'</tbody></table></div>'
+    :'<div class="emp">Aucune location active</div>';
+
+  // Alertes
+  var alerts=getAlerts();
+  if(!alerts.length)alerts.push({t:'ve',m:'✅ Aucune alerte — Tout est en ordre',d:"Aujourd'hui"});
+  document.getElementById('db-al').innerHTML=alerts.slice(0,6).map(function(a){
+    return '<div class="ai '+a.t+'"><div class="adot"></div><div class="at">'+a.m+'</div><div class="adt">'+(a.d||'')+'</div></div>';
+  }).join('');
+}
+
+function drawCharts(){
+  var locs=DATA.locations;var fuels=DATA.carburant;
+  var mois=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  var caData=mois.map(function(m,i){
+    var mm=String(i+1).padStart(2,'0');
+    return locs.filter(function(l){return l.direction==='Sortante'&&l.date_debut&&l.date_debut.startsWith('2025-'+mm)}).reduce(function(s,l){return s+(+l.total||0)},0);
+  });
+  var ctx1=document.getElementById('chart-ca');
+  if(chartCA)chartCA.destroy();
+  chartCA=new Chart(ctx1,{type:'bar',data:{labels:mois,datasets:[{label:'CA (CFA)',data:caData,backgroundColor:'rgba(232,114,42,.7)',borderColor:'var(--or)',borderWidth:1,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8892a4',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8892a4',font:{size:10},callback:function(v){return N(v)}}}}}});
+
+  var byF={};
+  fuels.forEach(function(f){var fo=f.fournisseur||'Autre';byF[fo]=(byF[fo]||0)+(+f.litres||0)});
+  var ctx2=document.getElementById('chart-fuel');
+  if(chartFuel)chartFuel.destroy();
+  var fnames=Object.keys(byF);var fvals=fnames.map(function(k){return byF[k]});
+  var fColors=['rgba(232,114,42,.8)','rgba(245,183,49,.8)','rgba(232,69,69,.8)'];
+  chartFuel=new Chart(ctx2,{type:'doughnut',data:{labels:fnames,datasets:[{data:fvals,backgroundColor:fColors,borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#8892a4',font:{size:11},padding:15}}}}});
+}
+
+function rParc(){
+  var s=(document.getElementById('ps')?document.getElementById('ps').value||'':'').toLowerCase();
+  var f=document.getElementById('pf')?document.getElementById('pf').value||'':'';
+  var engs=DATA.engins.filter(function(e){return(!s||(e.nom+(e.modele||'')).toLowerCase().includes(s))&&(!f||e.statut===f)});
+  var all=DATA.engins;
+  document.getElementById('parc-kr').innerHTML=
+    K('o',all.length,'TOTAL','')+K('g',all.filter(function(e){return e.statut==='Disponible'}).length,'DISPONIBLE','')+
+    K('b',all.filter(function(e){return e.statut==='Loué'}).length,'LOUÉ','')+
+    K('r',all.filter(function(e){return e.statut==='Maintenance'}).length,'MAINTENANCE','')+
+    K('y',all.filter(function(e){return e.statut==='Transit'}).length,'TRANSIT','');
+  var mCA=Math.max.apply(null,all.map(function(e){return e.ca||0}).concat([1]));
+  document.getElementById('parc-tb').innerHTML=engs.length?engs.map(function(e){
+    var d=dLeft(e.certif);var cc=d<0?'var(--rd)':d<30?'var(--yl)':'var(--mu2)';
+    return '<tr>'+
+      '<td><strong>'+e.nom+'</strong><br><span style="font-size:11px;color:var(--mu2)">'+(e.modele||'')+'</span></td>'+
+      '<td class="mn2" style="color:var(--or);font-weight:700">'+e.capacite+'T</td>'+
+      '<td style="font-size:12px">'+(e.type||'')+'</td>'+
+      '<td><span class="bd '+stC(e.statut)+'">'+e.statut+'</span></td>'+
+      '<td class="mn2" style="text-align:center">'+(e.jours||0)+'</td>'+
+      '<td class="mn2" style="color:var(--gr)">'+N(e.ca)+' CFA</td>'+
+      '<td class="mn2" style="color:'+cc+';font-size:11px">'+(e.certif||'N/A')+(d<30&&d>=0?' ('+d+'j)':d<0?' ⚠️':'')+'</td>'+
+      '<td class="mn2" style="font-size:10px;color:var(--mu2)">'+N(e.tarif_j)+'/'+N(e.tarif_h)+'/'+N(e.tarif_m)+'</td>'+
+      '<td class="mn2">'+(e.conso||'?')+' L/H</td>'+
+      '<td style="display:flex;gap:4px">'+
+        '<button class="btn bg bsm" onclick="oStat(\''+e.id+'\')">📋</button>'+
+        (can('canEdit')?'<button class="btn bb bsm" onclick="editEng(\''+e.id+'\')">✏️</button>':'')+
+        (can('canDelete')?'<button class="btn br bsm" onclick="delEng(\''+e.id+'\')">🗑️</button>':'')+
+      '</td></tr>';
+  }).join(''):'<tr><td colspan="10" class="emp">Aucun engin</td></tr>';
+}
+
+function rLoc(){
+  var s=(document.getElementById('ls')?document.getElementById('ls').value||'':'').toLowerCase();
+  var d=document.getElementById('ld')?document.getElementById('ld').value||'':'';
+  var fs=document.getElementById('lfs')?document.getElementById('lfs').value||'':'';
+  var locs=DATA.locations.filter(function(l){
+    var ms=!s||((l.client||l.fournisseur||'')+l.engin).toLowerCase().includes(s);
+    return ms&&(!d||l.direction===d)&&(!fs||l.statut===fs);
+  });
+  var all=DATA.locations;
+  var caS=all.filter(function(l){return l.direction==='Sortante'}).reduce(function(s,l){return s+(+l.total||0)},0);
+  var stCo=all.filter(function(l){return l.direction==='Entrante'}).reduce(function(s,l){return s+(+l.cout||0)},0);
+  document.getElementById('loc-kr').innerHTML=
+    K('g',all.filter(function(l){return l.direction==='Sortante'&&l.statut==='En cours'}).length,'LOCATIONS ACTIVES','')+
+    K('p',all.filter(function(l){return l.direction==='Entrante'&&l.statut==='En cours'}).length,'SOUS-TRAIT. ACTIVE','')+
+    K('o',N(caS),'CA SORTANT (CFA)','','font-size:16px;color:var(--or)')+
+    K('r',N(stCo),'COÛT SOUS-TRAIT.','','font-size:16px;color:var(--rd)')+
+    K('g',N(caS-stCo),'MARGE (CFA)','','font-size:16px;color:var(--gr)');
+  document.getElementById('loc-tb').innerHTML=locs.length?locs.map(function(l){
+    var isIn=l.direction==='Entrante';var ec=l.statut==='En cours';
+    var ov=ec&&l.date_fin&&new Date(l.date_fin)<new Date();
+    return '<tr'+(ov?' style="background:rgba(232,69,69,.04)"':'')+'>'+
+      '<td class="mn2" style="font-size:10px;color:var(--mu2)">'+l.id+'</td>'+
+      '<td><span class="bd '+(isIn?'inp':'out')+'">'+(isIn?'📥':'📤')+'</span></td>'+
+      '<td><strong>'+(isIn?(l.fournisseur||'—'):(l.client||'—'))+'</strong></td>'+
+      '<td class="mn2">'+l.engin+'</td>'+
+      '<td><span class="bd '+tyC(l.type_fact)+'">'+l.type_fact+'</span></td>'+
+      '<td class="mn2">'+(l.date_debut||'—')+'</td>'+
+      '<td class="mn2" style="color:'+(ov?'var(--rd)':'var(--tx)')+'">'+(l.date_fin||'—')+(ov?' ⚠️':'')+'</td>'+
+      '<td class="mn2" style="color:var(--gr);font-weight:700">'+N(l.total||l.tarif)+' CFA</td>'+
+      '<td><span class="bd '+(ec?'lou':'dsp')+'">'+(ec?'En cours':'Terminé')+'</span></td>'+
+      '<td>'+(l.escorte==='Oui'?'🚔':'—')+'</td>'+
+      '<td style="white-space:nowrap">'+(ec?
+        '<button class="btn br bsm" style="margin-right:4px" onclick="clot(\''+l.id+'\')">🔒</button>'+
+        '<button class="btn bb bsm" style="margin-right:4px" onclick="oProlong(\''+l.id+'\')">📅</button>'+
+        (l.direction==='Sortante'?'<button class="btn bg2 bsm" onclick="genFacture(\''+l.id+'\')">🖨️</button>':'')
+        :'<span style="color:var(--mu);font-size:11px">Terminée</span>')+
+      '</td></tr>';
+  }).join(''):'<tr><td colspan="11" class="emp">Aucune location</td></tr>';
+}
+
+function rFuel(){
+  var s=(document.getElementById('fus')?document.getElementById('fus').value||'':'').toLowerCase();
+  var ff=document.getElementById('fuf')?document.getElementById('fuf').value||'':'';
+  var fc=document.getElementById('fuc')?document.getElementById('fuc').value||'':'';
+  var fuels=DATA.carburant.filter(function(f){
+    return(!s||(f.engin+(f.fournisseur||'')).toLowerCase().includes(s))&&(!ff||f.fournisseur===ff)&&(!fc||f.circuit===fc);
+  });
+  var all=DATA.carburant;
+  var tL=all.reduce(function(s,f){return s+(+f.litres||0)},0);
+  var tC=all.reduce(function(s,f){return s+((+f.litres||0)*(+f.prix_litre||0))},0);
+  var cuL=all.filter(function(f){return f.circuit==='Cuve'}).reduce(function(s,f){return s+(+f.litres||0)},0);
+  document.getElementById('fuel-kr').innerHTML=
+    K('y',N(tL),'LITRES TOTAL','','font-size:22px;color:var(--yl)')+
+    K('r',N(tC),'COÛT TOTAL (CFA)','','font-size:18px;color:var(--rd)')+
+    K('b',all.length,'RAVITAILLEMENTS','')+
+    K('t',N(cuL),'VIA CUVE 1000L','litres','font-size:18px;color:var(--tl)');
+  var byF={};
+  all.forEach(function(f){
+    var fo=f.fournisseur||'Inconnu';
+    if(!byF[fo])byF[fo]={li:0,co:0,n:0,di:0,cu:0};
+    byF[fo].li+=(+f.litres||0);byF[fo].co+=(+f.litres||0)*(+f.prix_litre||0);byF[fo].n++;
+    if(f.circuit==='Cuve')byF[fo].cu+=(+f.litres||0);else byF[fo].di+=(+f.litres||0);
+  });
+  var sorted=Object.entries(byF).sort(function(a,b){return b[1].li-a[1].li});
+  var mL=sorted.length?sorted[0][1].li:1;
+  var fCol={'OLA Energy':'var(--or)','Shell':'var(--yl)','Total Sococim':'var(--rd)'};
+  document.getElementById('fuel-rg').innerHTML=sorted.map(function(entry,i){
+    var nom=entry[0];var d=entry[1];
+    return '<div class="rc"><div class="rb">#'+(i+1)+'</div>'+
+      '<div class="rn">⛽ '+nom+'</div><div class="rc2" style="color:'+(fCol[nom]||'var(--or)')+'">FOURNISSEUR</div>'+
+      '<div class="rs"><span class="rsl">Total litres</span><span class="rsv" style="color:var(--yl)">'+N(d.li)+' L</span></div>'+
+      '<div class="rs"><span class="rsl">Coût total</span><span class="rsv" style="color:var(--rd)">'+N(d.co)+' CFA</span></div>'+
+      '<div class="rs"><span class="rsl">⛽ Direct</span><span class="rsv">'+N(d.di)+' L</span></div>'+
+      '<div class="rs"><span class="rsl">🛢️ Cuve</span><span class="rsv" style="color:var(--tl)">'+N(d.cu)+' L</span></div>'+
+      '<div class="rbar"><div class="rfill" style="width:'+Math.round((d.li/mL)*100)+'%;background:'+(fCol[nom]||'var(--or)')+'"></div></div></div>';
+  }).join('');
+  document.getElementById('fuel-tb').innerHTML=fuels.length?fuels.map(function(f){
+    return '<tr>'+
+      '<td class="mn2">'+(f.date_plein||'—')+'</td><td><strong>'+f.engin+'</strong></td>'+
+      '<td class="mn2" style="color:'+(fCol[f.fournisseur]||'var(--or)')+'">'+(f.fournisseur||'—')+'</td>'+
+      '<td><span class="bd '+(f.circuit==='Cuve'?'trn':'dsp')+'">'+(f.circuit==='Cuve'?'🛢️ Cuve':'⛽ Direct')+'</span></td>'+
+      '<td class="mn2" style="color:var(--yl)">'+N(f.litres)+' L</td>'+
+      '<td class="mn2">'+N(f.prix_litre)+'</td>'+
+      '<td class="mn2" style="color:var(--rd)">'+N((+f.litres||0)*(+f.prix_litre||0))+' CFA</td>'+
+      '<td class="mn2">'+N(f.compteur)+' h</td>'+
+      '<td>'+(f.operateur||'—')+'</td></tr>';
+  }).join(''):'<tr><td colspan="9" class="emp">Aucune saisie</td></tr>';
+}
+
+function rEsc(){
+  var s=(document.getElementById('ess')?document.getElementById('ess').value||'':'').toLowerCase();
+  var escs=DATA.escortes.filter(function(e){return!s||(e.engin+e.client+(e.trajet||'')).toLowerCase().includes(s)});
+  var all=DATA.escortes;
+  var tC=all.reduce(function(s,e){return s+(+e.cout||0)},0);
+  var tF=all.reduce(function(s,e){return s+(+e.facture||0)},0);
+  document.getElementById('esc-kr').innerHTML=
+    K('b',all.length,'ESCORTES TOTAL','')+
+    K('r',N(tC),'COÛT GEND.','','font-size:16px;color:var(--rd)')+
+    K('g',N(tF),'FACTURÉ CLIENT','','font-size:16px;color:var(--gr)')+
+    K('o',N(tF-tC),'MARGE (CFA)','','font-size:16px;color:var(--or)');
+  document.getElementById('esc-tb').innerHTML=escs.length?escs.map(function(e){
+    var mg=(+e.facture||0)-(+e.cout||0);var sc=e.statut==='Payé'?'var(--gr)':e.statut==='Facturé'?'var(--yl)':'var(--mu2)';
+    return '<tr>'+
+      '<td class="mn2">'+(e.date_esc||'—')+'</td><td class="mn2">'+e.engin+'</td>'+
+      '<td style="font-size:12px">'+(e.trajet||'—')+'</td>'+
+      '<td class="mn2">'+(e.km||0)+' km</td><td class="mn2">'+(e.gendarmes||0)+'</td>'+
+      '<td class="mn2" style="color:var(--rd)">'+N(e.cout)+' CFA</td>'+
+      '<td class="mn2" style="color:var(--gr)">'+N(e.facture)+' CFA</td>'+
+      '<td class="mn2" style="color:'+(mg>=0?'var(--gr)':'var(--rd)')+';font-weight:700">'+N(mg)+' CFA</td>'+
+      '<td><strong>'+e.client+'</strong></td>'+
+      '<td class="mn2" style="color:'+sc+'">'+e.statut+'</td>'+
+      '<td style="white-space:nowrap">'+
+        (e.statut!=='Payé'?'<button class="btn bg bsm" style="margin-right:4px" onclick="chgEsc(\''+e.id+'\',\'Payé\')">✅ Payé</button>':'')+
+        (e.statut==='Payé'?'<button class="btn by bsm" onclick="chgEsc(\''+e.id+'\',\'En attente\')">↩️</button>':'')+
+      '</td></tr>';
+  }).join(''):'<tr><td colspan="11" class="emp">Aucune escorte</td></tr>';
+}
+
+function rPers(){
+  var s=(document.getElementById('prs')?document.getElementById('prs').value||'':'').toLowerCase();
+  var pers=DATA.personnel.filter(function(p){return!s||(p.prenom+p.nom+(p.poste||'')).toLowerCase().includes(s)});
+  var all=DATA.personnel;
+  var expCount=all.filter(function(p){return p.caces_date&&dLeft(addY(p.caces_date,1))<30}).length;
+  document.getElementById('pers-kr').innerHTML=
+    K('b',all.length,'PERSONNEL TOTAL','')+
+    K('g',all.filter(function(p){return p.caces_date&&dLeft(addY(p.caces_date,1))>=30}).length,'CACES VALIDES','')+
+    K('r',expCount,'CACES À RENOUVELER','dans 30j');
+  document.getElementById('pers-tb').innerHTML=pers.length?pers.map(function(p){
+    var ex=p.caces_date?addY(p.caces_date,1):'';var st=ex?sCert(ex):{c:'',t:'N/A',col:'var(--mu)'};
+    return '<tr>'+
+      '<td><strong>'+p.prenom+' '+p.nom+'</strong></td>'+
+      '<td style="font-size:12px">'+(p.poste||'—')+'</td>'+
+      '<td class="mn2" style="color:var(--bl)">'+(p.caces||'—')+'</td>'+
+      '<td class="mn2">'+(p.caces_date||'—')+'</td>'+
+      '<td class="mn2" style="color:'+(ex?'var(--tx)':'var(--mu)')+'">'+(ex||'—')+'</td>'+
+      '<td><span class="bd '+st.c+'" style="color:'+st.col+'">'+st.t+'</span></td>'+
+      '<td class="mn2">'+(p.telephone||'—')+'</td>'+
+      '<td>'+(p.cert_file?'<a href="'+p.cert_file+'" download="'+(p.cert_name||'cert')+'" class="btn bg bsm">📄</a>':'—')+'</td>'+
+      '<td style="display:flex;gap:4px">'+
+        (can('canEdit')?'<button class="btn bb bsm" onclick="editPers(\''+p.id+'\')">✏️</button>':'')+
+        (can('canDelete')?'<button class="btn br bsm" onclick="delPers(\''+p.id+'\')">🗑️</button>':'')+
+      '</td></tr>';
+  }).join(''):'<tr><td colspan="9" class="emp">Aucun personnel</td></tr>';
+}
+
+function rHSE(){
+  var vgps=DATA.vgp;var pers=DATA.personnel;var assus=DATA.assurances;
+  var vExp=vgps.filter(function(v){return v.date_vgp&&dLeft(addM(v.date_vgp,v.validite_mois))<0}).length;
+  var vWrn=vgps.filter(function(v){if(!v.date_vgp)return false;var d=dLeft(addM(v.date_vgp,v.validite_mois));return d>=0&&d<30}).length;
+  var cExp=pers.filter(function(p){return p.caces_date&&dLeft(addY(p.caces_date,1))<0}).length;
+  document.getElementById('hse-kr').innerHTML=
+    K('b',vgps.length,'VGP TOTALES','')+K('r',vExp,'VGP EXPIRÉES','')+
+    K('y',vWrn,'VGP À RENOUVELER','dans 30j')+K('r',cExp,'CACES EXPIRÉS','');
+  var alerts=getAlerts().filter(function(a){return a.src==='vgp'||a.src==='caces'||a.src==='assu'});
+  if(!alerts.length)alerts.push({t:'ve',m:'✅ Tout est valide',d:"Aujourd'hui"});
+  document.getElementById('hse-al').innerHTML=alerts.map(function(a){
+    return '<div class="ai '+a.t+'"><div class="adot"></div><div class="at">'+a.m+'</div><div class="adt">'+(a.d||'')+'</div></div>';
+  }).join('');
+  document.getElementById('vgp-tb').innerHTML=vgps.length?vgps.map(function(v){
+    var ex=v.date_vgp?addM(v.date_vgp,v.validite_mois):'';var st=ex?sCert(ex):{c:'',t:'N/A',col:'var(--mu)'};
+    return '<tr><td class="mn2">'+v.engin+'</td><td style="font-size:12px">'+v.type_vgp+'</td>'+
+      '<td class="mn2">'+(v.date_vgp||'—')+'</td>'+
+      '<td class="mn2" style="color:'+(ex&&dLeft(ex)<30?'var(--yl)':'var(--tx)')+'">'+(ex||'—')+'</td>'+
+      '<td><span class="bd '+st.c+'" style="color:'+st.col+'">'+st.t+'</span></td>'+
+      '<td style="font-size:12px">'+(v.organisme||'—')+'</td>'+
+      '<td>'+(can('canDelete')?'<button class="btn br bsm" onclick="delVGP(\''+v.id+'\')">🗑️</button>':'—')+'</td></tr>';
+  }).join(''):'<tr><td colspan="7" class="emp">Aucune VGP</td></tr>';
+  document.getElementById('assu-tb').innerHTML=assus.length?assus.map(function(a){
+    var st=a.date_expiry?sCert(a.date_expiry):{c:'',t:'N/A',col:'var(--mu)'};
+    return '<tr><td class="mn2">'+a.engin+'</td>'+
+      '<td><strong>'+(a.compagnie||'—')+'</strong></td>'+
+      '<td style="font-size:12px">'+(a.type_ass||'—')+'</td>'+
+      '<td class="mn2" style="color:'+(a.date_expiry&&dLeft(a.date_expiry)<60?'var(--yl)':'var(--tx)')+'">'+(a.date_expiry||'—')+'</td>'+
+      '<td class="mn2" style="color:var(--gr)">'+(a.prime?N(a.prime)+' CFA':'—')+'</td>'+
+      '<td><span class="bd '+st.c+'" style="color:'+st.col+'">'+st.t+'</span></td>'+
+      '<td>'+(a.file_data?'<a href="'+a.file_data+'" download="'+(a.file_name||'police')+'" class="btn bg bsm">📄</a>':'—')+'</td>'+
+      '<td>'+(can('canDelete')?'<button class="btn br bsm" onclick="delAssu(\''+a.id+'\')">🗑️</button>':'—')+'</td></tr>';
+  }).join(''):'<tr><td colspan="8" class="emp">Aucune assurance</td></tr>';
+}
+
+function rFin(){
+  var locs=DATA.locations;var fuels=DATA.carburant;var escs=DATA.escortes;
+  var srt=locs.filter(function(l){return l.direction==='Sortante'});
+  var ent=locs.filter(function(l){return l.direction==='Entrante'});
+  var ca=srt.reduce(function(s,l){return s+(+l.total||0)},0);
+  var stC=ent.reduce(function(s,l){return s+(+l.cout||0)},0);
+  var fc=fuels.reduce(function(s,f){return s+((+f.litres||0)*(+f.prix_litre||0))},0);
+  var ec=escs.reduce(function(s,e){return s+(+e.cout||0)},0);
+  var mg=ca-stC-fc-ec;
+  document.getElementById('fin-kr').innerHTML=
+    K('g',N(ca),'CA LOCATIONS (CFA)','','font-size:18px;color:var(--gr)')+
+    K('p',N(stC),'SOUS-TRAITANCE','','font-size:18px;color:var(--pu)')+
+    K('r',N(fc),'CARBURANT','','font-size:18px;color:var(--rd)')+
+    K('y',N(ec),'ESCORTES','','font-size:18px;color:var(--yl)')+
+    K('o',N(mg),'MARGE BRUTE',(ca>0?Math.round((mg/ca)*100):0)+'% de marge','font-size:18px;color:var(--or)');
+  var byCl={};srt.forEach(function(l){if(l.client)byCl[l.client]=(byCl[l.client]||0)+(+l.total||0)});
+  document.getElementById('fin-cl').innerHTML=Object.entries(byCl).sort(function(a,b){return b[1]-a[1]}).map(function(entry){
+    var c=entry[0];var v=entry[1];var pct=ca>0?Math.round((v/ca)*100):0;
+    return '<tr><td><strong>'+c+'</strong></td><td class="mn2" style="color:var(--gr)">'+N(v)+' CFA</td>'+
+      '<td><div style="display:flex;align-items:center;gap:6px"><div style="width:60px;height:4px;background:var(--brd2);border-radius:2px">'+
+      '<div style="width:'+pct+'%;height:100%;background:var(--gr);border-radius:2px"></div></div>'+
+      '<span class="mn2" style="font-size:10px">'+pct+'%</span></div></td></tr>';
+  }).join('');
+  var byEng={};srt.forEach(function(l){if(l.engin)byEng[l.engin]=(byEng[l.engin]||0)+(+l.total||0)});
+  var fByEng={};fuels.forEach(function(f){if(f.engin)fByEng[f.engin]=(fByEng[f.engin]||0)+((+f.litres||0)*(+f.prix_litre||0))});
+  document.getElementById('fin-eng').innerHTML=Object.entries(byEng).sort(function(a,b){return b[1]-a[1]}).map(function(entry){
+    var nom=entry[0];var rev=entry[1];var fuel=fByEng[nom]||0;
+    var mg2=rev>0?Math.round(((rev-fuel)/rev)*100):0;var mc=mg2>50?'var(--gr)':mg2>20?'var(--yl)':'var(--rd)';
+    return '<tr><td class="mn2">'+nom+'</td><td class="mn2" style="color:var(--gr)">'+N(rev)+' CFA</td>'+
+      '<td class="mn2" style="color:var(--rd)">'+N(fuel)+' CFA</td>'+
+      '<td class="mn2" style="color:'+mc+';font-weight:700">'+mg2+'%</td></tr>';
+  }).join('');
+  var mois=['Janv.','Févr.','Mars','Avr.','Mai','Juin','Juil.','Août','Sept.','Oct.','Nov.','Déc.'];
+  document.getElementById('fin-mo').innerHTML=mois.map(function(m,i){
+    var mm=String(i+1).padStart(2,'0');
+    var mca=srt.filter(function(l){return l.date_debut&&l.date_debut.startsWith('2025-'+mm)}).reduce(function(s,l){return s+(+l.total||0)},0);
+    var mst=ent.filter(function(l){return l.date_debut&&l.date_debut.startsWith('2025-'+mm)}).reduce(function(s,l){return s+(+l.cout||0)},0);
+    var mec=escs.filter(function(e){return e.date_esc&&e.date_esc.startsWith('2025-'+mm)}).reduce(function(s,e){return s+(+e.cout||0)},0);
+    var mfc=fuels.filter(function(f){return f.date_plein&&f.date_plein.startsWith('2025-'+mm)}).reduce(function(s,f){return s+((+f.litres||0)*(+f.prix_litre||0))},0);
+    var mg=mca-mst-mec-mfc;var pct=mca>0?Math.round((mg/mca)*100):0;
+    var mc=pct>50?'var(--gr)':pct>20?'var(--yl)':mca>0?'var(--rd)':'var(--mu)';
+    return '<tr><td><strong>'+m+'</strong></td>'+
+      '<td class="mn2" style="color:'+(mca?'var(--gr)':'var(--mu)')+'">'+(mca?N(mca)+' CFA':'—')+'</td>'+
+      '<td class="mn2" style="color:'+(mst?'var(--pu)':'var(--mu)')+'">'+(mst?N(mst)+' CFA':'—')+'</td>'+
+      '<td class="mn2" style="color:'+(mec?'var(--yl)':'var(--mu)')+'">'+(mec?N(mec)+' CFA':'—')+'</td>'+
+      '<td class="mn2" style="color:'+(mfc?'var(--rd)':'var(--mu)')+'">'+(mfc?N(mfc)+' CFA':'—')+'</td>'+
+      '<td class="mn2" style="color:'+mc+';font-weight:700">'+(mca?N(mg)+' CFA':'—')+'</td>'+
+      '<td class="mn2" style="color:'+mc+'">'+(mca?pct+'%':'—')+'</td></tr>';
+  }).join('');
+}
+
+function rJournal(){
+  document.getElementById('journal-kr').innerHTML=
+    K('b',JOURNAL.length,'ACTIONS TOTALES','')+
+    K('g',JOURNAL.filter(function(l){return l.user===CU.name}).length,'MES ACTIONS','')+
+    K('o',JOURNAL.filter(function(l){return l.action.includes('Ajout')||l.action.includes('Nouvelle')||l.action.includes('Saisie')}).length,'AJOUTS','');
+  document.getElementById('journal-list').innerHTML=JOURNAL.length?
+    '<table><thead><tr><th>UTILISATEUR</th><th>RÔLE</th><th>ACTION</th><th>DÉTAIL</th><th>DATE / HEURE</th></tr></thead><tbody>'+
+    JOURNAL.map(function(l){
+      return '<tr>'+
+        '<td class="mn2" style="color:var(--or)">'+l.user+'</td>'+
+        '<td><span class="bd dsp" style="font-size:9px">'+l.role+'</span></td>'+
+        '<td style="font-size:12px">'+l.action+'</td>'+
+        '<td style="font-size:11px;color:var(--mu2)">'+(l.detail||'—')+'</td>'+
+        '<td class="mn2" style="color:var(--mu)">'+l.time+'</td></tr>';
+    }).join('')+'</tbody></table>'
+    :'<div class="emp">Aucune activité enregistrée</div>';
+}
+
+// ═══ CLOCK ═══════════════════════════════════════
+setInterval(function(){
+  var c=document.getElementById('clk');
+  if(c)c.textContent=new Date().toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+},1000);
+</script>
+</body>
+</html>
